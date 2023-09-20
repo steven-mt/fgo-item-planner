@@ -1,9 +1,9 @@
 "use client";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useState } from "react";
-import { Database } from "./types/supabase";
+import { Database } from "../types/supabase";
 
-export default function AuthForm() {
+export const AuthForm = () => {
   const supabase = createClientComponentClient<Database>();
 
   const [email, setEmail] = useState("");
@@ -61,4 +61,4 @@ export default function AuthForm() {
       </div>
     </>
   );
-}
+};

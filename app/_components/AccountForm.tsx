@@ -3,10 +3,11 @@ import {
   Session,
   createClientComponentClient,
 } from "@supabase/auth-helpers-nextjs";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Database } from "../types/supabase";
 
-export default function AccountForm({ session }: { session: Session | null }) {
+export const AccountForm = ({ session }: { session: Session | null }) => {
   const supabase = createClientComponentClient<Database>();
   const [loading, setLoading] = useState(true);
   const [fullname, setFullname] = useState<string | null>(null);
@@ -14,6 +15,8 @@ export default function AccountForm({ session }: { session: Session | null }) {
   const [website, setWebsite] = useState<string | null>(null);
   const [avatar_url, setAvatarUrl] = useState<string | null>(null);
   const user = session?.user;
+
+  const router = useRouter();
 
   const getProfile = useCallback(async () => {
     try {
@@ -127,12 +130,16 @@ export default function AccountForm({ session }: { session: Session | null }) {
       </div>
 
       <div>
-        <form action="/auth/signout" method="post">
-          <button className="button block" type="submit">
-            Sign out
-          </button>
-        </form>
+        <button
+          className="button block"
+          onClick={async () => {
+            await supabase.auth.signOut();
+            router.refresh();
+          }}
+        >
+          Sign out
+        </button>
       </div>
     </div>
   );
-}
+};
