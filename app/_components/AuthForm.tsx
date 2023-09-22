@@ -6,6 +6,8 @@ import { Database } from "../types/supabase";
 export const AuthForm = () => {
   const supabase = createClientComponentClient<Database>();
 
+  const [loading, setLoading] = useState(false);
+
   const [email, setEmail] = useState("");
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setEmail(e.target.value);
@@ -31,6 +33,8 @@ export const AuthForm = () => {
   const handleSignIn = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
+    setLoading(true);
+
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
       options: {
@@ -39,7 +43,10 @@ export const AuthForm = () => {
     });
 
     if (error) alert(error);
-    else alert("Check email");
+    else {
+      setLoading(false);
+      alert("Check email");
+    }
   };
 
   return (
@@ -56,7 +63,7 @@ export const AuthForm = () => {
             onChange={handleChange}
             required
           />
-          <button>Sign In</button>
+          <button>{loading ? "Signing in..." : "Sign In"}</button>
         </form>
       </div>
     </>
