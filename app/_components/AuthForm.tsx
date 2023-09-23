@@ -1,6 +1,7 @@
 "use client";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { useHash } from "../_hooks/useHash";
 import { Database } from "../types/supabase";
 
 export const AuthForm = () => {
@@ -14,9 +15,6 @@ export const AuthForm = () => {
   };
 
   const getRedirectURL = () => {
-    console.log(process?.env?.NEXT_PUBLIC_SITE_URL);
-    console.log(process?.env?.NEXT_PUBLIC_VERCEL_URL);
-
     let url =
       process?.env?.NEXT_PUBLIC_SITE_URL ?? // Set this to your site URL in production env.
       process?.env?.NEXT_PUBLIC_VERCEL_URL ?? // Automatically set by Vercel.
@@ -27,6 +25,11 @@ export const AuthForm = () => {
 
     // Make sure to include a trailing `/`.
     url = url.charAt(url.length - 1) === "/" ? url : `${url}/`;
+
+    if (url.endsWith("auth/callback/")) console.log("yes");
+    if (url.endsWith("auth/callback")) console.log("no");
+    url = url.endsWith("auth/callback/") ? url : `${url}auth/callback/`;
+
     return url;
   };
 
@@ -34,6 +37,7 @@ export const AuthForm = () => {
     e.preventDefault();
 
     setLoading(true);
+    setErrorDescription("");
 
     const { error } = await supabase.auth.signInWithOtp({
       email: email,
@@ -43,11 +47,25 @@ export const AuthForm = () => {
     });
 
     if (error) alert(error);
-    else {
-      setLoading(false);
-      alert("Check email");
-    }
+    else alert("Check email");
+
+    setLoading(false);
   };
+
+  const [errorDescription, setErrorDescription] = useState("");
+  const hash = useHash();
+  useEffect(() => {
+    const parsedHash = new URLSearchParams(hash as string);
+    const parsedError = parsedHash.get("error_description");
+
+    parsedError ? setErrorDescription(parsedError) : setErrorDescription("");
+
+    history.replaceState(
+      null,
+      "",
+      window.location.pathname + window.location.search,
+    );
+  }, [hash]);
 
   return (
     <>
@@ -65,6 +83,7 @@ export const AuthForm = () => {
           />
           <button>{loading ? "Signing in..." : "Sign In"}</button>
         </form>
+        {errorDescription && <div>{errorDescription}</div>}
       </div>
     </>
   );
