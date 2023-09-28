@@ -1,11 +1,6 @@
-"use client";
-
-import { Box, CssBaseline, ThemeProvider } from "@mui/material";
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import { useState } from "react";
-import { Header } from "./_components/Header";
-import { darkTheme, lightTheme } from "./_theme/theme";
+import { LayoutParent } from "./_components/LayoutParent";
 import "./globals.css";
 
 const inter = Inter({ subsets: ["latin"] });
@@ -20,30 +15,11 @@ export default function RootLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const drawerWidth = 240;
-
-  const [isDark, setIsDark] = useState(false);
-
-  const switchTheme = () => {
-    setIsDark(!isDark);
-  };
-
   return (
     <html lang="en">
-      <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
-        <CssBaseline />
-        <body className={inter.className}>
-          <Header switchTheme={switchTheme} drawerWidth={drawerWidth} />
-          <Box
-            sx={{
-              width: { sm: `calc(100% - ${drawerWidth}px)` },
-              ml: { sm: `${drawerWidth}px` },
-            }}
-          >
-            {children}
-          </Box>
-        </body>
-      </ThemeProvider>
+      <body className={inter.className}>
+        <LayoutParent>{children}</LayoutParent>
+      </body>
     </html>
   );
 }
