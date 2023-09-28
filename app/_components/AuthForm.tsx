@@ -26,8 +26,6 @@ export const AuthForm = () => {
     // Make sure to include a trailing `/`.
     url = url.charAt(url.length - 1) === "/" ? url : `${url}/`;
 
-    if (url.endsWith("auth/callback/")) console.log("yes");
-    if (url.endsWith("auth/callback")) console.log("no");
     url = url.endsWith("auth/callback/") ? url : `${url}auth/callback/`;
 
     return url;
