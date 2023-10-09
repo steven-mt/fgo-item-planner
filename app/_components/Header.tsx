@@ -5,10 +5,8 @@ import {
   AppBar,
   Box,
   Button,
-  // CssBaseline,
   Divider,
   Drawer,
-  // Grid,
   IconButton,
   List,
   ListItem,
@@ -20,10 +18,15 @@ import {
   Typography,
 } from "@mui/material";
 import { Spin as HamburgerSpin } from "hamburger-react";
-import React, { useState } from "react";
+import { useState } from "react";
 import { DarkModeSwitch } from "react-toggle-dark-mode";
+import { AuthModal } from "./AuthModal";
+import { LoginButton } from "./LoginButton";
 
-type Props = { switchTheme: any; drawerWidth: number };
+type Props = {
+  switchTheme: any;
+  drawerWidth: number;
+};
 
 type Page = "home" | "materials";
 
@@ -39,12 +42,11 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
   const handleDrawerToggle = () => setIsDrawerOpen((prevState) => !prevState);
 
   const [selectedPage, setSelectedPage] = useState<Page>("home");
-  const handleListItemClick = (
-    event: React.MouseEvent<HTMLDivElement, MouseEvent>,
-    page: Page,
-  ) => {
+  const handleListItemClick = (page: Page) => {
     setSelectedPage(page);
   };
+
+  const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
   const drawerContent = (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
@@ -55,7 +57,7 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
           <ListItem key={item} disablePadding>
             <ListItemButton
               selected={selectedPage === item}
-              onClick={(event) => handleListItemClick(event, item)}
+              onClick={() => handleListItemClick(item)}
               sx={{ textAlign: "center" }}
             >
               <ListItemText primary={item} />
@@ -90,8 +92,6 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
           component={"nav"}
           sx={{
             position: "sticky",
-            // width: { sm: `calc(100% - ${drawerWidth}px)` },
-            // ml: { sm: `${drawerWidth}px` },
             zIndex: (theme) => theme.zIndex.drawer + 1,
           }}
         >
@@ -101,8 +101,8 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
               aria-label="open drawer"
               edge="start"
               sx={{
-                mr: 2,
                 display: { sm: "none" },
+                p: 0,
               }}
             >
               <HamburgerSpin
@@ -112,14 +112,22 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
               />
             </IconButton>
 
-            <Typography variant="h6" component={"div"}>
+            <Typography
+              variant="h6"
+              component={"div"}
+              sx={{ display: { sm: "none" } }}
+            >
               Home
             </Typography>
+
+            <Box sx={{ order: { xs: 1, sm: 0 } }}>
+              <LoginButton setIsModalOpen={setIsModalOpen} />
+            </Box>
 
             <Box sx={{ flexGrow: 1, justifyContent: "end", display: "flex" }}>
               <Box sx={{ display: { xs: "none", sm: "flex" } }}>
                 {filterItems.map((item) => (
-                  <Button key={item} sx={{ color: "inherit" }}>
+                  <Button key={item} color="inherit">
                     {item}
                   </Button>
                 ))}
@@ -127,29 +135,22 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
 
               <Box sx={{ display: { xs: "flex", sm: "none" } }}>
                 <Tooltip title="Filter">
-                  <IconButton>
-                    <FilterAlt color="action" />
+                  <IconButton sx={{ color: "primary.contrastText" }}>
+                    <FilterAlt />
                   </IconButton>
                 </Tooltip>
               </Box>
             </Box>
 
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "end",
-                ml: 2,
-                userSelect: "none",
+            <IconButton
+              onClick={() => {
+                console.log("iconbutton");
+                switchTheme();
+                setIsToggleDark(!isToggleDark);
               }}
             >
-              <DarkModeSwitch
-                checked={isToggleDark}
-                onChange={(checked: boolean) => {
-                  switchTheme();
-                  setIsToggleDark(checked);
-                }}
-              />
-            </Box>
+              <DarkModeSwitch checked={isToggleDark} onChange={() => {}} />
+            </IconButton>
           </Toolbar>
         </AppBar>
 
@@ -184,44 +185,9 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
             {drawerContent}
           </Drawer>
         </Box>
-      </Box>
 
-      {/* 
-      <Box component={"main"} sx={{ p: 3 }}>
-        <Toolbar />
-      </Box> */}
-      {/* <Grid sx={{ p: 2 }}>
-        <Grid
-          container
-          direction={"row"}
-          justifyContent={"center"}
-          alignItems={"center"}
-        >
-          <Grid item xs={1}>
-            a
-          </Grid>
-          <Grid item xs={1}>
-            b
-          </Grid>
-          <Grid
-            item
-            xs={10}
-            rowSpacing={1}
-            container
-            direction={"row"}
-            alignItems={"center"}
-            justifyContent={"flex-end"}
-          >
-            <DarkModeSwitch
-              checked={isToggleDark}
-              onChange={(checked: boolean) => {
-                switchTheme();
-                setIsToggleDark(checked);
-              }}
-            />
-          </Grid>
-        </Grid>
-      </Grid> */}
+        <AuthModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
+      </Box>
     </>
   );
 };

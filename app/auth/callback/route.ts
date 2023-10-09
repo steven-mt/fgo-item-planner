@@ -1,4 +1,4 @@
-import { Database } from "@/app/types/supabase";
+import { Database } from "@/app/_types/supabase";
 import { createRouteHandlerClient } from "@supabase/auth-helpers-nextjs";
 import { AuthError } from "@supabase/supabase-js";
 import { cookies } from "next/headers";

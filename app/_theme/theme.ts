@@ -17,8 +17,5 @@ export const lightTheme = createTheme({
     primary: {
       main: "#1f6fff",
     },
-    action: {
-      active: "#fff",
-    },
   },
 });

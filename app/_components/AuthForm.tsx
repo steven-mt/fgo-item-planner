@@ -2,7 +2,7 @@
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
 import { useHash } from "../_hooks/useHash";
-import { Database } from "../types/supabase";
+import { Database } from "../_types/supabase";
 
 export const AuthForm = () => {
   const supabase = createClientComponentClient<Database>();

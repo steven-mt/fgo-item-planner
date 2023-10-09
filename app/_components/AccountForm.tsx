@@ -5,7 +5,7 @@ import {
 } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
-import { Database } from "../types/supabase";
+import { Database } from "../_types/supabase";
 
 export const AccountForm = ({ session }: { session: Session | null }) => {
   const supabase = createClientComponentClient<Database>();
