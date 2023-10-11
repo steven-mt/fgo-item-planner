@@ -144,7 +144,6 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
 
             <IconButton
               onClick={() => {
-                console.log("iconbutton");
                 switchTheme();
                 setIsToggleDark(!isToggleDark);
               }}

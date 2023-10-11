@@ -12,6 +12,7 @@ import {
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { useUserContext } from "../_hooks/useUserContext";
 import { Database } from "../_types/supabase";
 
 type Props = { setIsModalOpen: Dispatch<SetStateAction<boolean>> };
@@ -19,7 +20,7 @@ type Props = { setIsModalOpen: Dispatch<SetStateAction<boolean>> };
 export const LoginButton = ({ setIsModalOpen }: Props) => {
   const supabase = createClientComponentClient<Database>();
 
-  const [isLoggedIn, setIsLoggedIn] = useState<boolean>(false);
+  const { currentUser, setCurrentUser } = useUserContext();
   const [userEmail, setUserEmail] = useState<string | undefined>(undefined);
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -32,30 +33,20 @@ export const LoginButton = ({ setIsModalOpen }: Props) => {
     await supabase.auth.signOut();
     router.refresh();
 
-    setIsLoggedIn(false);
+    setCurrentUser(null);
   };
 
   useEffect(() => {
-    const getSession = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (session) {
-        setIsLoggedIn(true);
-        setUserEmail(session.user.email);
-      } else {
-        setIsLoggedIn(false);
-        setUserEmail(undefined);
-      }
-    };
-
-    getSession();
-  }, [supabase.auth]);
+    if (currentUser) {
+      setUserEmail(currentUser.email);
+    } else {
+      setUserEmail(undefined);
+    }
+  }, [currentUser]);
 
   return (
     <>
-      {isLoggedIn ? (
+      {currentUser ? (
         <Tooltip title={userEmail}>
           <IconButton
             color="inherit"
@@ -86,6 +77,7 @@ export const LoginButton = ({ setIsModalOpen }: Props) => {
         >
           Logged in
         </MenuItem>
+
         <MenuItem
           className="pointer-events-none hover:bg-transparent"
           disableRipple
@@ -93,7 +85,9 @@ export const LoginButton = ({ setIsModalOpen }: Props) => {
         >
           {userEmail}
         </MenuItem>
+
         <Divider />
+
         <MenuItem onClick={handleLogOut}>Logout</MenuItem>
       </Menu>
     </>

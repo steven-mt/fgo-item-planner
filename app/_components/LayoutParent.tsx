@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { darkTheme, lightTheme } from "../_theme/theme";
 import { Header } from "./Header";
+import { UserProvider } from "./UserProvider";
 
 export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
   const drawerWidth = 240;
@@ -32,15 +33,19 @@ export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
         <StyledEngineProvider injectFirst>
           <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
             <CssBaseline />
-            <Header switchTheme={switchTheme} drawerWidth={drawerWidth} />
-            <Box
-              sx={{
-                width: { sm: `calc(100% - ${drawerWidth}px)` },
-                ml: { sm: `${drawerWidth}px` },
-              }}
-            >
-              {children}
-            </Box>
+
+            <UserProvider>
+              <Header switchTheme={switchTheme} drawerWidth={drawerWidth} />
+
+              <Box
+                sx={{
+                  width: { sm: `calc(100% - ${drawerWidth}px)` },
+                  ml: { sm: `${drawerWidth}px` },
+                }}
+              >
+                {children}
+              </Box>
+            </UserProvider>
           </ThemeProvider>
         </StyledEngineProvider>
       </CacheProvider>

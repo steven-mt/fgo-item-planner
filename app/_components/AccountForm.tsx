@@ -1,30 +1,26 @@
 "use client";
+
 import {
-  Session,
+  User,
   createClientComponentClient,
 } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { Database } from "../_types/supabase";
 
-export const AccountForm = ({ session }: { session: Session | null }) => {
+export const AccountForm = ({ user }: { user: User }) => {
   const supabase = createClientComponentClient<Database>();
   const [loading, setLoading] = useState(true);
   const [fullname, setFullname] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
   const [website, setWebsite] = useState<string | null>(null);
   const [avatar_url, setAvatarUrl] = useState<string | null>(null);
-  const user = session?.user;
 
   const router = useRouter();
 
   const getProfile = useCallback(async () => {
     try {
       setLoading(true);
-
-      if (!user) {
-        throw new Error();
-      }
 
       let { data, error, status } = await supabase
         .from("profiles")
@@ -87,7 +83,7 @@ export const AccountForm = ({ session }: { session: Session | null }) => {
     <div className="form-widget">
       <div>
         <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={session?.user.email} disabled />
+        <input id="email" type="text" value={user.email} disabled />
       </div>
       <div>
         <label htmlFor="fullName">Full Name</label>
