@@ -21,7 +21,7 @@ import { Spin as HamburgerSpin } from "hamburger-react";
 import { useState } from "react";
 import { DarkModeSwitch } from "react-toggle-dark-mode";
 import { AuthModal } from "./AuthModal";
-import { LoginButton } from "./LoginButton";
+import { LoginProfileButton } from "./LoginProfileButton";
 
 type Props = {
   switchTheme: any;
@@ -33,13 +33,9 @@ type Page = "home" | "materials";
 export const Header = ({ switchTheme, drawerWidth }: Props) => {
   const [isToggleDark, setIsToggleDark] = useState(false);
 
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-
   const navItems: Page[] = ["home", "materials"];
   const optionItems = ["Help", "Settings"];
   const filterItems = ["filter1", "filter2"];
-
-  const handleDrawerToggle = () => setIsDrawerOpen((prevState) => !prevState);
 
   const [selectedPage, setSelectedPage] = useState<Page>("home");
   const handleListItemClick = (page: Page) => {
@@ -48,6 +44,8 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
 
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
 
+  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
+  const handleDrawerToggle = () => setIsDrawerOpen((prevState) => !prevState);
   const drawerContent = (
     <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
       <Toolbar />
@@ -121,7 +119,7 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
             </Typography>
 
             <Box sx={{ order: { xs: 1, sm: 0 } }}>
-              <LoginButton setIsModalOpen={setIsModalOpen} />
+              <LoginProfileButton setIsModalOpen={setIsModalOpen} />
             </Box>
 
             <Box sx={{ flexGrow: 1, justifyContent: "end", display: "flex" }}>

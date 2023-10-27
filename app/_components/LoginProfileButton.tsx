@@ -17,7 +17,7 @@ import { Database } from "../_types/supabase";
 
 type Props = { setIsModalOpen: Dispatch<SetStateAction<boolean>> };
 
-export const LoginButton = ({ setIsModalOpen }: Props) => {
+export const LoginProfileButton = ({ setIsModalOpen }: Props) => {
   const supabase = createClientComponentClient<Database>();
 
   const { currentUser, setCurrentUser } = useUserContext();
@@ -44,52 +44,60 @@ export const LoginButton = ({ setIsModalOpen }: Props) => {
     }
   }, [currentUser]);
 
+  const loginButton = (
+    <Button
+      variant="outlined"
+      color="inherit"
+      onClick={() => {
+        setIsModalOpen(true);
+      }}
+      sx={{ ml: { xs: 1, sm: 0 } }}
+    >
+      Login
+    </Button>
+  );
+
+  const profileIconButton = (
+    <Tooltip title={userEmail}>
+      <IconButton
+        color="inherit"
+        onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
+          setAnchorEl(event.currentTarget)
+        }
+      >
+        <AccountCircle />
+      </IconButton>
+    </Tooltip>
+  );
+
+  const profileMenu = (
+    <Menu open={open} anchorEl={anchorEl} onClose={() => setAnchorEl(null)}>
+      <MenuItem
+        className="pointer-events-none hover:bg-transparent"
+        disableRipple
+      >
+        Logged in
+      </MenuItem>
+
+      <MenuItem
+        className="pointer-events-none hover:bg-transparent"
+        disableRipple
+        dense
+      >
+        {userEmail}
+      </MenuItem>
+
+      <Divider />
+
+      <MenuItem onClick={handleLogOut}>Logout</MenuItem>
+    </Menu>
+  );
+
   return (
     <>
-      {currentUser ? (
-        <Tooltip title={userEmail}>
-          <IconButton
-            color="inherit"
-            onClick={(event: React.MouseEvent<HTMLButtonElement>) =>
-              setAnchorEl(event.currentTarget)
-            }
-          >
-            <AccountCircle />
-          </IconButton>
-        </Tooltip>
-      ) : (
-        <Button
-          variant="outlined"
-          color="inherit"
-          onClick={() => {
-            setIsModalOpen(true);
-          }}
-          sx={{ ml: { xs: 1, sm: 0 } }}
-        >
-          Login
-        </Button>
-      )}
+      {currentUser ? profileIconButton : loginButton}
 
-      <Menu open={open} anchorEl={anchorEl} onClose={() => setAnchorEl(null)}>
-        <MenuItem
-          className="pointer-events-none hover:bg-transparent"
-          disableRipple
-        >
-          Logged in
-        </MenuItem>
-
-        <MenuItem
-          className="pointer-events-none hover:bg-transparent"
-          disableRipple
-          dense
-        >
-          {userEmail}
-        </MenuItem>
-
-        <Divider />
-
-        <MenuItem onClick={handleLogOut}>Logout</MenuItem>
-      </Menu>
+      {profileMenu}
     </>
   );
 };
