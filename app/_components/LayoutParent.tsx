@@ -8,10 +8,12 @@ import {
   StyledEngineProvider,
   ThemeProvider,
 } from "@mui/material";
-import { useState } from "react";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
+import { useEffect, useState } from "react";
+import { useUserContext } from "../_hooks/useUserContext";
 import { darkTheme, lightTheme } from "../_theme/theme";
+import { Database } from "../_types/supabase";
 import { Header } from "./Header";
-import { UserProvider } from "./UserProvider";
 
 export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
   const drawerWidth = 240;
@@ -27,6 +29,23 @@ export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
     prepend: true,
   });
 
+  const { setCurrentUser } = useUserContext();
+
+  const supabase = createClientComponentClient<Database>();
+
+  useEffect(() => {
+    const getUser = async () => {
+      const {
+        data: { session },
+      } = await supabase.auth.getSession();
+
+      if (session) setCurrentUser(session.user);
+      else setCurrentUser(null);
+    };
+
+    getUser();
+  }, [setCurrentUser, supabase.auth]);
+
   return (
     <>
       <CacheProvider value={cache}>
@@ -34,18 +53,16 @@ export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
           <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
             <CssBaseline />
 
-            <UserProvider>
-              <Header switchTheme={switchTheme} drawerWidth={drawerWidth} />
+            <Header switchTheme={switchTheme} drawerWidth={drawerWidth} />
 
-              <Box
-                sx={{
-                  width: { sm: `calc(100% - ${drawerWidth}px)` },
-                  ml: { sm: `${drawerWidth}px` },
-                }}
-              >
-                {children}
-              </Box>
-            </UserProvider>
+            <Box
+              sx={{
+                width: { sm: `calc(100% - ${drawerWidth}px)` },
+                ml: { sm: `${drawerWidth}px` },
+              }}
+            >
+              {children}
+            </Box>
           </ThemeProvider>
         </StyledEngineProvider>
       </CacheProvider>

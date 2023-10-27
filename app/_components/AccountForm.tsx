@@ -1,30 +1,31 @@
 "use client";
 
-import {
-  User,
-  createClientComponentClient,
-} from "@supabase/auth-helpers-nextjs";
+import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
+import { useUserContext } from "../_hooks/useUserContext";
 import { Database } from "../_types/supabase";
 
-export const AccountForm = ({ user }: { user: User }) => {
+export const AccountForm = () => {
   const supabase = createClientComponentClient<Database>();
   const [loading, setLoading] = useState(true);
   const [fullname, setFullname] = useState<string | null>(null);
   const [username, setUsername] = useState<string | null>(null);
-  const [website, setWebsite] = useState<string | null>(null);
-  const [avatar_url, setAvatarUrl] = useState<string | null>(null);
 
   const router = useRouter();
 
+  const { currentUser } = useUserContext();
+  const user = currentUser;
+
   const getProfile = useCallback(async () => {
+    if (!user) return;
+
     try {
       setLoading(true);
 
       let { data, error, status } = await supabase
         .from("profiles")
-        .select(`full_name, username, website, avatar_url`)
+        .select(`full_name, username`)
         .eq("id", user.id)
         .single();
 
@@ -35,8 +36,6 @@ export const AccountForm = ({ user }: { user: User }) => {
       if (data) {
         setFullname(data.full_name);
         setUsername(data.username);
-        setWebsite(data.website);
-        setAvatarUrl(data.avatar_url);
       }
     } catch (error) {
       alert("Error loading user data!");
@@ -51,13 +50,9 @@ export const AccountForm = ({ user }: { user: User }) => {
 
   async function updateProfile({
     username,
-    website,
-    avatar_url,
   }: {
     username: string | null;
     fullname: string | null;
-    website: string | null;
-    avatar_url: string | null;
   }) {
     try {
       setLoading(true);
@@ -66,8 +61,6 @@ export const AccountForm = ({ user }: { user: User }) => {
         id: user?.id as string,
         full_name: fullname,
         username,
-        website,
-        avatar_url,
         updated_at: new Date().toISOString(),
       });
       if (error) throw error;
@@ -80,62 +73,53 @@ export const AccountForm = ({ user }: { user: User }) => {
   }
 
   return (
-    <div className="form-widget">
-      <div>
-        <label htmlFor="email">Email</label>
-        <input id="email" type="text" value={user.email} disabled />
-      </div>
-      <div>
-        <label htmlFor="fullName">Full Name</label>
-        <input
-          id="fullName"
-          type="text"
-          value={fullname || ""}
-          onChange={(e) => setFullname(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="username">Username</label>
-        <input
-          id="username"
-          type="text"
-          value={username || ""}
-          onChange={(e) => setUsername(e.target.value)}
-        />
-      </div>
-      <div>
-        <label htmlFor="website">Website</label>
-        <input
-          id="website"
-          type="url"
-          value={website || ""}
-          onChange={(e) => setWebsite(e.target.value)}
-        />
-      </div>
-
-      <div>
-        <button
-          className="button primary block"
-          onClick={() =>
-            updateProfile({ fullname, username, website, avatar_url })
-          }
-          disabled={loading}
-        >
-          {loading ? "Loading ..." : "Update"}
-        </button>
-      </div>
-
-      <div>
-        <button
-          className="button block"
-          onClick={async () => {
-            await supabase.auth.signOut();
-            router.refresh();
-          }}
-        >
-          Sign out
-        </button>
-      </div>
-    </div>
+    <>
+      {user && (
+        <div className="form-widget">
+          <div>
+            <label htmlFor="email">Email</label>
+            <input id="email" type="text" value={user.email} disabled />
+          </div>
+          <div>
+            <label htmlFor="fullName">Full Name</label>
+            <input
+              id="fullName"
+              type="text"
+              value={fullname || ""}
+              onChange={(e) => setFullname(e.target.value)}
+            />
+          </div>
+          <div>
+            <label htmlFor="username">Username</label>
+            <input
+              id="username"
+              type="text"
+              value={username || ""}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+          </div>
+          <div>
+            <button
+              className="button primary block"
+              onClick={() => updateProfile({ fullname, username })}
+              disabled={loading}
+            >
+              {loading ? "Loading ..." : "Update"}
+            </button>
+          </div>
+          <div>
+            <button
+              className="button block"
+              onClick={async () => {
+                await supabase.auth.signOut();
+                router.refresh();
+              }}
+            >
+              Sign out
+            </button>
+          </div>
+        </div>
+      )}
+    </>
   );
 };
