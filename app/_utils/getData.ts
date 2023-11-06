@@ -1,7 +1,6 @@
 import { mkdir, writeFile } from "node:fs";
 import { readFile } from "node:fs/promises";
 import { dirname } from "path";
-import { cache } from "react";
 import type {
   NiceItemAmount,
   NiceLvlUpMaterial,
@@ -24,7 +23,7 @@ const jpParsedSvtPath = `${outDir}/parsed_servant_jp.json`;
 const naAtlasSvtPath = `${outDir}/atlas_servant_na.json`;
 const naParsedSvtPath = `${outDir}/parsed_servant_na.json`;
 
-const fetchApiData = cache(async (url: string) => {
+const fetchApiData = async (url: string) => {
   try {
     const response = await fetch(url, { cache: "no-store" });
     const data = await response.json();
@@ -39,7 +38,7 @@ const fetchApiData = cache(async (url: string) => {
     if (error instanceof Error) console.log(error.message);
     else console.log(error);
   }
-});
+};
 
 const getFromFile = async (path: string) => {
   try {
