@@ -9,7 +9,8 @@ import {
   ThemeProvider,
 } from "@mui/material";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
+import { useLocalStorage } from "../_hooks/useLocalStorage";
 import { useUserContext } from "../_hooks/useUserContext";
 import { darkTheme, lightTheme } from "../_theme/theme";
 import { Database } from "../_types/supabase";
@@ -18,10 +19,10 @@ import { Header } from "./Header";
 export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
   const drawerWidth = 240;
 
-  const [isDark, setIsDark] = useState(false);
+  const [isDarkLs, setIsDarkLs] = useLocalStorage("darkTheme", true);
 
   const switchTheme = () => {
-    setIsDark(!isDark);
+    setIsDarkLs(!isDarkLs);
   };
 
   const cache = createCache({
@@ -50,10 +51,14 @@ export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
     <>
       <CacheProvider value={cache}>
         <StyledEngineProvider injectFirst>
-          <ThemeProvider theme={isDark ? darkTheme : lightTheme}>
+          <ThemeProvider theme={isDarkLs ? darkTheme : lightTheme}>
             <CssBaseline />
 
-            <Header switchTheme={switchTheme} drawerWidth={drawerWidth} />
+            <Header
+              isDark={isDarkLs}
+              switchTheme={switchTheme}
+              drawerWidth={drawerWidth}
+            />
 
             <Box
               sx={{

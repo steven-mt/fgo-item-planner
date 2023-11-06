@@ -24,13 +24,14 @@ import { AuthModal } from "./AuthModal";
 import { LoginProfileButton } from "./LoginProfileButton";
 
 type Props = {
+  isDark: boolean;
   switchTheme: any;
   drawerWidth: number;
 };
 
 type Page = "home" | "materials";
 
-export const Header = ({ switchTheme, drawerWidth }: Props) => {
+export const Header = ({ isDark, switchTheme, drawerWidth }: Props) => {
   const [isToggleDark, setIsToggleDark] = useState(false);
 
   const navItems: Page[] = ["home", "materials"];
@@ -146,7 +147,7 @@ export const Header = ({ switchTheme, drawerWidth }: Props) => {
                 setIsToggleDark(!isToggleDark);
               }}
             >
-              <DarkModeSwitch checked={isToggleDark} onChange={() => {}} />
+              <DarkModeSwitch checked={isDark} onChange={() => {}} />
             </IconButton>
           </Toolbar>
         </AppBar>
