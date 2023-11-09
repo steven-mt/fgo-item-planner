@@ -1,6 +1,3 @@
-import { mkdir, writeFile } from "node:fs";
-import { readFile } from "node:fs/promises";
-import { dirname } from "path";
 import type {
   NiceItemAmount,
   NiceLvlUpMaterial,
@@ -17,13 +14,9 @@ const jpAtlasSvtUrl =
   "https://api.atlasacademy.io/export/JP/nice_servant_lang_en.json";
 const naAtlasSvtUrl = "https://api.atlasacademy.io/export/NA/nice_servant.json";
 
-const outDir = `${process.cwd()}/build/data`;
-const jpAtlasSvtPath = `${outDir}/atlas_servant_jp.json`;
-const jpParsedSvtPath = `${outDir}/parsed_servant_jp.json`;
-const naAtlasSvtPath = `${outDir}/atlas_servant_na.json`;
-const naParsedSvtPath = `${outDir}/parsed_servant_na.json`;
-
 const fetchApiData = async (url: string) => {
+  console.log(`fetching from ${url}`);
+
   try {
     const response = await fetch(url, { cache: "no-store" });
     const data = await response.json();
@@ -40,83 +33,10 @@ const fetchApiData = async (url: string) => {
   }
 };
 
-const getFromFile = async (path: string) => {
-  try {
-    const data = JSON.parse(await readFile(path, { encoding: "utf-8" }));
-
-    if (isEmpty(data))
-      throw new Error(`error: empty object in file at ${path}`);
-
-    console.log(`file found in ${path}, using file`);
-
-    return data;
-  } catch (error) {
-    process.stdout.write("readFile error: ");
-    if (error instanceof Error) console.log(error.message);
-    else console.log(error);
-
-    return null;
-  }
-};
-
-const saveToFile = (path: string, data: any) => {
-  try {
-    mkdir(dirname(path), { recursive: true }, (err) => {
-      if (err) throw err;
-
-      const writeData = JSON.stringify(data);
-
-      writeFile(path, writeData, (err) => {
-        if (err) throw err;
-
-        const writeDataLength = writeData.length;
-
-        console.log(
-          `saved file to ${path}\nstring length: ${writeData.length}\n${
-            writeDataLength < 50 ? `${writeData}\n` : ""
-          }object length: ${Object.keys(data).length}`,
-        );
-      });
-    });
-  } catch (error) {
-    process.stdout.write("error saving file: ");
-    if (error instanceof Error) console.log(error.message);
-    else console.log(error);
-  }
-};
-
-const getFileOrFallback = async (
-  path: string,
-  fallback: () => any,
-  isFallbackAsync: boolean,
-) => {
-  const fileData = await getFromFile(path);
-
-  if (fileData) {
-    return fileData;
-  } else {
-    const data = isFallbackAsync ? await fallback() : fallback();
-    saveToFile(path, data);
-    return data;
-  }
-};
-
 export const getData = async () => {
-  const jpAtlasServants = (await getFileOrFallback(
-    jpAtlasSvtPath,
-    () => {
-      return fetchApiData(jpAtlasSvtUrl);
-    },
-    true,
-  )) as NiceServant[];
+  const jpAtlasServants = (await fetchApiData(jpAtlasSvtUrl)) as NiceServant[];
 
-  const naAtlasServants = (await getFileOrFallback(
-    naAtlasSvtPath,
-    () => {
-      return fetchApiData(naAtlasSvtUrl);
-    },
-    true,
-  )) as NiceServant[];
+  const naAtlasServants = (await fetchApiData(naAtlasSvtUrl)) as NiceServant[];
 
   const parseItemAmount = (
     niceItemAmountArray: NiceItemAmount[],
@@ -200,17 +120,9 @@ export const getData = async () => {
     });
   };
 
-  const parsedJPSvt = (await getFileOrFallback(
-    jpParsedSvtPath,
-    () => parseServant(jpAtlasServants),
-    false,
-  )) as ParsedServant[];
+  const parsedJPSvt = parseServant(jpAtlasServants) as ParsedServant[];
 
-  const parsedNASvt = (await getFileOrFallback(
-    naParsedSvtPath,
-    () => parseServant(naAtlasServants),
-    false,
-  )) as ParsedServant[];
+  const parsedNASvt = parseServant(naAtlasServants) as ParsedServant[];
 
   return {
     parsedJPSvt: parsedJPSvt,
