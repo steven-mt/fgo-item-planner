@@ -1,38 +1,42 @@
 "use client";
 
-import {
-  Dispatch,
-  SetStateAction,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import { useCallback, useEffect, useState } from "react";
 
 export const useLocalStorage = <T>(
   key: string,
   defaultValue: T,
-): [T, Dispatch<SetStateAction<T>>] => {
-  const [innerValue, setInnerValue] = useState<T>(() => {
-    return defaultValue;
-  });
-
+): [T, (value: T) => void] => {
   const getValue = useCallback(() => {
-    try {
-      const data = window.localStorage.getItem(key);
+    let value = defaultValue;
 
-      return data;
+    try {
+      const rawValue = window.localStorage.getItem(key);
+
+      if (!rawValue) {
+        console.log(
+          `Value from localStorage key "${key}" does not exist yet, setting value to default "${defaultValue}"`,
+        );
+
+        value = defaultValue;
+      } else {
+        value = (
+          rawValue === "undefined" ? undefined : JSON.parse(rawValue)
+        ) as T;
+      }
     } catch (error) {
       console.group(`Error reading localStorage key "${key}"`);
       if (error instanceof Error) console.log(error.message);
       else console.log(error);
       console.groupEnd();
-
-      return null;
+    } finally {
+      return value;
     }
-  }, [key]);
+  }, [defaultValue, key]);
 
-  const setValue: Dispatch<SetStateAction<T>> = useCallback(
-    (value: any) => {
+  const [innerValue, setInnerValue] = useState<T>(getValue);
+
+  const setValue = useCallback(
+    (value: T) => {
       try {
         setInnerValue(value);
 
@@ -48,26 +52,8 @@ export const useLocalStorage = <T>(
   );
 
   useEffect(() => {
-    const data = getValue();
-
-    if (!data) {
-      setValue(defaultValue);
-      setInnerValue(defaultValue);
-    } else {
-      try {
-        setInnerValue(JSON.parse(data));
-      } catch (error) {
-        console.group(`Error parsing value from localStorage key "${key}"`);
-        if (error instanceof Error) console.log(error.message);
-        else console.log(error);
-        console.log(`Setting value to default "${defaultValue}"`);
-        console.groupEnd();
-
-        setValue(defaultValue);
-        setInnerValue(defaultValue);
-      }
-    }
-  }, [defaultValue, getValue, key, setValue]);
+    setValue(getValue());
+  }, [getValue, setValue]);
 
   return [innerValue, setValue];
 };
