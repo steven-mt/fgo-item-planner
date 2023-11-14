@@ -10,7 +10,6 @@ import {
 } from "@mui/material";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect } from "react";
-import { useHasMounted } from "../_hooks/useHasMounted";
 import { useLSTheme } from "../_hooks/useLSTheme";
 import { useUserContext } from "../_hooks/useUserContext";
 import { darkTheme, lightTheme } from "../_theme/theme";
@@ -47,9 +46,6 @@ export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
 
     getUser();
   }, [setCurrentUser, supabase.auth]);
-
-  const hasMounted = useHasMounted();
-  if (!hasMounted) return null;
 
   return (
     <>

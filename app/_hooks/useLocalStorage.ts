@@ -5,7 +5,10 @@ import { useCallback, useEffect, useState } from "react";
 export const useLocalStorage = <T>(
   key: string,
   defaultValue: T,
-): [T, (value: T) => void] => {
+): [T | undefined, (value: T) => void] => {
+  // allow value to be declared during server render, but remains undefined
+  const [innerValue, setInnerValue] = useState<T>();
+
   const getValue = useCallback(() => {
     let value = defaultValue;
 
@@ -32,8 +35,6 @@ export const useLocalStorage = <T>(
       return value;
     }
   }, [defaultValue, key]);
-
-  const [innerValue, setInnerValue] = useState<T>(getValue);
 
   const setValue = useCallback(
     (value: T) => {

@@ -18,7 +18,8 @@ export const useLSTheme = (): [boolean, (value: boolean | null) => void] => {
       if (prefersDark.matches) setIsDarkTheme(true);
       else setIsDarkTheme(false);
     }
-  });
+  }, isDarkTheme !== undefined);
 
+  // return true when isDarkTheme is still undefined during server rendering
   return [isDarkTheme ?? true, setIsDarkTheme];
 };
