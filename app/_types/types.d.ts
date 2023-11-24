@@ -1,13 +1,17 @@
+export interface ParsedItem {
+  id: number;
+  name: string;
+  icon: string;
+}
+
 export interface ParsedItemAmount {
-  [name: string]: {
-    amount: number;
-    icon: string;
-  };
+  item: ParsedItem;
+  amount: number;
 }
 
 export interface ParsedLvlUpMaterials {
   [levelOrCostumeID: string]: {
-    items: ParsedItemAmount;
+    items: ParsedItemAmount[];
     qp: number;
   };
 }
@@ -38,7 +42,7 @@ export interface ParsedServant {
     name: string;
     detail: string;
     icon: string;
-    unlockMaterials: ParsedItemAmount;
+    unlockMaterials: ParsedItemAmount[];
   }[];
   appendSkillMaterials: ParsedLvlUpMaterials;
   costumeMaterials: ParsedLvlUpMaterials;

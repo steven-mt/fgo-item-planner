@@ -2,7 +2,7 @@ import { getData } from "../_utils/getData";
 import { TestItem } from "./TestItem";
 
 export const TestSC = async () => {
-  const { parsedJPSvt: data } = await getData();
+  const data = await getData();
 
   return (
     <>

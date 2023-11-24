@@ -1,7 +1,6 @@
-import { Suspense } from "react";
 import { AccountForm } from "./_components/AccountForm";
 import { AuthForm } from "./_components/AuthForm";
-import { TestSC } from "./_components/TestSC";
+import { TestDataRoute } from "./_components/TestDataRoute";
 
 export default async function Home() {
   return (
@@ -10,9 +9,7 @@ export default async function Home() {
 
       <AccountForm />
 
-      <Suspense fallback={<p>Loading...</p>}>
-        <TestSC />
-      </Suspense>
+      <TestDataRoute />
     </>
   );
 }

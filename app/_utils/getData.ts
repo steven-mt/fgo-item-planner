@@ -8,28 +8,25 @@ import type {
   ParsedLvlUpMaterials,
   ParsedServant,
 } from "../_types/types";
-import { isEmpty } from "./utils";
+import { fetchWithRetry, isEmpty } from "./utils";
 
 const jpAtlasSvtUrl =
   "https://api.atlasacademy.io/export/JP/nice_servant_lang_en.json";
 const naAtlasSvtUrl = "https://api.atlasacademy.io/export/NA/nice_servant.json";
 
 const fetchApiData = async (url: string) => {
-  console.log(`fetching from ${url}`);
-
   try {
-    const response = await fetch(url, { cache: "no-store" });
+    const response = await fetchWithRetry(url, 5, 1000, { cache: "no-store" });
     const data = await response.json();
 
     if (isEmpty(data)) throw new Error("data is empty");
 
-    console.log("fetch success");
-
     return data;
   } catch (error) {
-    process.stdout.write("fetch error: ");
+    console.group("Fetch error: ");
     if (error instanceof Error) console.log(error.message);
     else console.log(error);
+    console.groupEnd();
   }
 };
 
@@ -40,16 +37,15 @@ export const getData = async () => {
 
   const parseItemAmount = (
     niceItemAmountArray: NiceItemAmount[],
-  ): ParsedItemAmount => {
-    return Object.fromEntries(
-      niceItemAmountArray.map((niceItemAmount) => [
-        niceItemAmount.item.name,
-        {
-          amount: niceItemAmount.amount,
-          icon: niceItemAmount.item.icon,
-        },
-      ]),
-    );
+  ): ParsedItemAmount[] => {
+    return niceItemAmountArray.map<ParsedItemAmount>((niceItemAmount) => ({
+      item: {
+        id: niceItemAmount.item.id,
+        name: niceItemAmount.item.name,
+        icon: niceItemAmount.item.icon,
+      },
+      amount: niceItemAmount.amount,
+    }));
   };
 
   const parseSkillMaterials = (materials: {
@@ -120,12 +116,17 @@ export const getData = async () => {
     });
   };
 
-  const parsedJPSvt = parseServant(jpAtlasServants) as ParsedServant[];
+  const parsedJPSvts = parseServant(jpAtlasServants) as ParsedServant[];
 
-  const parsedNASvt = parseServant(naAtlasServants) as ParsedServant[];
+  const parsedNASvts = parseServant(naAtlasServants) as ParsedServant[];
 
-  return {
-    parsedJPSvt: parsedJPSvt,
-    parsedNASvt: parsedNASvt,
-  };
+  const mergedSvt = parsedJPSvts.map((parsedJPSvt) => {
+    const foundNASvt = parsedNASvts.find(
+      (parsedNASvt) => parsedNASvt.id === parsedJPSvt.id,
+    );
+
+    return foundNASvt ?? parsedJPSvt;
+  });
+
+  return mergedSvt;
 };
