@@ -33,14 +33,41 @@ The easiest way to deploy your Next.js app is to use the [Vercel Platform](https
 
 Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
 
+## Development
+
+Install dependencies:
+
+```bash
+pnpm install
+```
+
+### API Type Definitions
+
+Create a virtual environment:
+
+```bash
+python -m venv /path/to/new/virtual/environment
+
+# Example 
+python -m venv .venv
+```
+
+Install python packages for retrieving type definitions from the [Atlas Academy API](https://github.com/atlasacademy/fgo-game-data-api):
+
 ```bash
 pip install -r requirements.txt
 ```
 
-```bash
-python -m venv venv
-```
+Convert the pydantic definitions in any of the files in `fgo_api_types` to typescript (in this example `nice.py` is used).  
+Note that the `json-schema-to-typescript` npm package must be installed for the `pydantic2ts` tool to work. Personally, I found that it only works if either the option `--json2ts-cmd "pnpm json2ts"` was used, or if it was installed globally (i.e. `pnpm add json-schema-to-typescript -g`) instead. I chose to use the former method and added the package to `devDependencies`.
 
 ```bash
-pydantic2ts --json2ts-cmd 'pnpm json2ts' --module .\venv\Lib\site-packages\fgo_api_types\nice.py --output .\app\_types\niceTest.ts
+# If json-schema-to-typescript is not installed globally
+pydantic2ts --json2ts-cmd 'pnpm json2ts' --module VENV_PATH/Lib/site-packages/fgo_api_types/nice.py --output OUTPUT_DIR/FILENAME.ts
+
+# If json-schema-to-typescript is installed globally, the "--json2ts-cmd" option is not necessary
+pydantic2ts --module VENV_PATH/Lib/site-packages/fgo_api_types/nice.py --output OUTPUT_DIR/FILENAME.ts
+
+# Example
+pydantic2ts --json2ts-cmd 'pnpm json2ts' --module ./.venv/Lib/site-packages/fgo_api_types/nice.py --output ./app/_types/atlasTypes.ts
 ```
