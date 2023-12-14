@@ -1,15 +1,12 @@
 import { AccountForm } from "./_components/AccountForm";
-import { AuthForm } from "./_components/AuthForm";
-import { TestDataRoute } from "./_components/TestDataRoute";
+import { Planner } from "./_components/Planner";
 
 export default async function Home() {
   return (
     <>
-      <AuthForm />
-
       <AccountForm />
 
-      <TestDataRoute />
+      <Planner />
     </>
   );
 }
