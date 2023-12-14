@@ -2,7 +2,7 @@ import {
   NiceItemAmount,
   NiceLvlUpMaterial,
   NiceServant,
-} from "../_types/apiNiceSvtTypes";
+} from "@/app/_types/apiNiceSvtTypes";
 import {
   AppendSkillNumKey,
   AscensionMaxLevels,
@@ -12,9 +12,9 @@ import {
   ParsedServant,
   ParsedSkill,
   SkillNum,
-} from "../_types/servant";
-import { SKILL_NUMBERS } from "./constants";
-import { fetchWithRetry, isEmpty } from "./utils";
+} from "@/app/_types/servant";
+import { SKILL_NUMBERS } from "@/app/_utils/constants";
+import { fetchWithRetry, isEmpty } from "@/app/_utils/utils";
 
 const jpAtlasSvtUrl =
   "https://api.atlasacademy.io/export/JP/nice_servant_lang_en.json";
@@ -29,7 +29,7 @@ const fetchApiData = async (url: string) => {
 
     return data;
   } catch (error) {
-    console.group("Fetch error: ");
+    console.group("Fetch API error: ");
     if (error instanceof Error) console.log(error.message);
     else console.log(error);
     console.groupEnd();

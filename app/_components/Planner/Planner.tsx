@@ -1,6 +1,5 @@
 "use client";
 
-import { AscensionAddEntryInt } from "@/app/_types/apiNiceSvtTypes";
 import { Action, CardData, PlannerState } from "@/app/_types/planner";
 
 import {
@@ -50,16 +49,16 @@ const getNewCardID = () => {
 };
 
 const getAscensionFromLevel = (
-  ascensionMap: AscensionAddEntryInt["ascension"],
+  ascensionMap: AscensionMaxLevels,
   servantLevel: number,
 ) => {
   const ascensions = Object.keys(ascensionMap);
 
   for (const ascLevel of ascensions) {
-    const ascLevelNumber = Number(ascLevel);
+    const ascLevelNumber = Number(ascLevel) as AscensionLevel;
 
     if (
-      servantLevel <= ascensionMap[ascLevel] &&
+      servantLevel <= ascensionMap[ascLevelNumber] &&
       ascLevelNumber < ascensions.length - 1
     )
       return ascLevelNumber;
@@ -78,7 +77,7 @@ const getAscensionLevelLimits = (
   const minLevel =
     ascensionLevel === minAscLevel
       ? minServantLevel
-      : ascensionMap[ascensionLevel];
+      : ascensionMap[(ascensionLevel - 1) as AscensionLevel];
 
   const maxLevel =
     ascensionLevel === maxAscLevel

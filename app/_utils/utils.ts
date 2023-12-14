@@ -15,18 +15,18 @@ export const fetchWithRetry = async (
 ) => {
   const timer = (ms: number) => new Promise((res) => setTimeout(res, ms));
 
-  console.log(`fetching from ${input}`);
+  console.log(`Fetching from ${input}`);
 
   for (var i = 0; i < maxAttempts; i++) {
     try {
       console.log(`(${i + 1}/${maxAttempts})`);
       const response = await fetch(input, init);
 
-      console.log("fetch success");
+      console.log("Fetch success");
 
       return response;
     } catch (error) {
-      console.group("Fetch error: ");
+      console.group("Fetch retry error: ");
       if (error instanceof Error) console.log(error.message);
       else console.log(error);
       console.groupEnd();
