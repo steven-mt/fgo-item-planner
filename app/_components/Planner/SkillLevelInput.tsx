@@ -1,7 +1,7 @@
 "use client";
 
 import { Action, ActionSkillChange, CardData } from "@/app/_types/planner";
-import { ParsedSkill } from "@/app/_types/servant";
+import { ParsedSkills } from "@/app/_types/servant";
 import { MAX_SKILL_LEVEL, MIN_SKILL_LEVEL } from "@/app/_utils/constants";
 import { Box, Typography } from "@mui/material";
 import Image from "next/image";
@@ -18,7 +18,7 @@ export const SkillLevelInput = ({
 }: {
   label: string;
   cardData: CardData;
-  skills: ParsedSkill[] | undefined;
+  skills: ParsedSkills | undefined;
   actionType: ActionSkillChange;
   dispatch: React.Dispatch<Action>;
 }) => {
@@ -79,7 +79,7 @@ export const SkillLevelInput = ({
     }
   };
 
-  const skillVariants: ParsedSkill[] = [];
+  const skillVariants: ParsedSkills = [];
 
   if (skills) {
     if (actionType === "skill1From" || actionType === "skill1To") {

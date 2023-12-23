@@ -83,7 +83,7 @@ export const AppendLevelInput = ({
     }
   };
 
-  let appendSkill: ParsedAppendSkillData = null;
+  let appendSkill: ParsedAppendSkillData | null = null;
 
   if (appendSkills) {
     if (actionType === "append1From" || actionType === "append1To")

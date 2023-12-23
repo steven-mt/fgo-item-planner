@@ -4,17 +4,15 @@ import {
   NiceServant,
 } from "@/app/_types/apiNiceSvtTypes";
 import {
-  AppendSkillNumKey,
-  AscensionMaxLevels,
-  ParsedAppendSkills,
   ParsedItemAmount,
   ParsedLvlUpMaterials,
   ParsedServant,
-  ParsedSkill,
-  SkillNum,
+  ascensionMaxLevelsRecordSchema,
+  parsedAppendSkillRecordSchema,
+  parsedServantSchema,
+  parsedSkillArraySchema,
 } from "@/app/_types/servant";
-import { SKILL_NUMBERS } from "@/app/_utils/constants";
-import { fetchWithRetry, isEmpty } from "@/app/_utils/utils";
+import { fetchWithRetry, isEmptyObject } from "@/app/_utils/utils";
 
 const jpAtlasSvtUrl =
   "https://api.atlasacademy.io/export/JP/nice_servant_lang_en.json";
@@ -25,7 +23,7 @@ const fetchApiData = async (url: string) => {
     const response = await fetchWithRetry(url, 5, 1000, { cache: "no-store" });
     const data = await response.json();
 
-    if (isEmpty(data)) throw new Error("data is empty");
+    if (isEmptyObject(data)) throw new Error("data is empty");
 
     return data;
   } catch (error) {
@@ -70,82 +68,19 @@ export const getData = async () => {
 
   const parseServant = (atlasServants: NiceServant[]) => {
     return atlasServants.map<ParsedServant>((atlasServant) => {
-      const ascensionLevels: AscensionMaxLevels = {
-        "0": 0,
-        "1": 0,
-        "2": 0,
-        "3": 0,
-        "4": 0,
-      };
-
-      Object.entries(atlasServant.ascensionAdd.lvMax.ascension).map(
-        ([ascLvl, maxLvl]) => {
-          if (
-            ascLvl === "0" ||
-            ascLvl === "1" ||
-            ascLvl === "2" ||
-            ascLvl === "3" ||
-            ascLvl === "4"
-          ) {
-            switch (ascLvl) {
-              case "0":
-                ascensionLevels[ascLvl] = maxLvl;
-                break;
-              case "1":
-                ascensionLevels[ascLvl] = maxLvl;
-                break;
-              case "2":
-                ascensionLevels[ascLvl] = maxLvl;
-                break;
-              case "3":
-                ascensionLevels[ascLvl] = maxLvl;
-                break;
-              case "4":
-                ascensionLevels[ascLvl] = maxLvl;
-                break;
-            }
-          }
-        },
-      );
-
-      const appendSkills: ParsedAppendSkills = {
-        "100": null,
-        "101": null,
-        "102": null,
-      };
-
-      atlasServant.appendPassive.map((atlasAppend) => {
-        let appendSkillNumKey: AppendSkillNumKey | null = null;
-
-        if (
-          atlasAppend.num === 100 ||
-          atlasAppend.num === 101 ||
-          atlasAppend.num === 102
-        ) {
-          switch (atlasAppend.num) {
-            case 100:
-              appendSkillNumKey = "100";
-              break;
-            case 101:
-              appendSkillNumKey = "101";
-              break;
-            case 102:
-              appendSkillNumKey = "102";
-              break;
-          }
-        }
-
-        if (appendSkillNumKey !== null) {
-          appendSkills[appendSkillNumKey] = {
+      const parsedAppendSkills = {};
+      atlasServant.appendPassive.forEach((atlasAppend) => {
+        Object.assign(parsedAppendSkills, {
+          [atlasAppend.num]: {
             name: atlasAppend.skill.name,
             detail: atlasAppend.skill.detail ?? "",
             icon: atlasAppend.skill.icon ?? "",
             unlockMaterials: parseItemAmount(atlasAppend.unlockMaterials),
-          };
-        }
+          },
+        });
       });
 
-      return {
+      return parsedServantSchema.parse({
         id: atlasServant.id,
         collectionNo: atlasServant.collectionNo,
         name: atlasServant.name,
@@ -156,31 +91,29 @@ export const getData = async () => {
         hpGrowth: atlasServant.hpGrowth,
         expGrowth: atlasServant.expGrowth,
 
-        ascensionLevels: ascensionLevels,
+        ascensionLevels: ascensionMaxLevelsRecordSchema.parse(
+          atlasServant.ascensionAdd.lvMax.ascension,
+        ),
 
         ascensionMaterials: parseSkillMaterials(
           atlasServant.ascensionMaterials,
         ),
 
-        skills: atlasServant.skills.map<ParsedSkill>((niceSkill) => {
-          let skillNum: SkillNum = null;
-
-          for (const number of SKILL_NUMBERS) {
-            if (niceSkill.num === number) skillNum = number;
-          }
-
-          return {
-            num: skillNum,
-            name: niceSkill.name,
-            detail: niceSkill.detail ?? "",
-            icon: niceSkill.icon ?? "",
-            cooldown: niceSkill.coolDown,
-          };
-        }),
+        skills: parsedSkillArraySchema.parse(
+          atlasServant.skills.map((atlasSkill) => {
+            return {
+              num: atlasSkill.num,
+              name: atlasSkill.name,
+              detail: atlasSkill.detail ?? "",
+              icon: atlasSkill.icon ?? "",
+              cooldown: atlasSkill.coolDown,
+            };
+          }),
+        ),
 
         skillMaterials: parseSkillMaterials(atlasServant.skillMaterials),
 
-        appendSkills: appendSkills,
+        appendSkills: parsedAppendSkillRecordSchema.parse(parsedAppendSkills),
 
         appendSkillMaterials: parseSkillMaterials(
           atlasServant.appendSkillMaterials,
@@ -192,7 +125,7 @@ export const getData = async () => {
           ...atlasServant.extraAssets.faces.ascension,
           ...atlasServant.extraAssets.faces.costume,
         },
-      };
+      });
     });
   };
 

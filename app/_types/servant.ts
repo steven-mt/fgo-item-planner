@@ -1,96 +1,103 @@
+import { z } from "zod";
 import {
   APPEND_SKILL_NUMBERS,
   ASCENSION_LEVELS,
   SKILL_NUMBERS,
 } from "../_utils/constants";
+import { zodNumericEnum, zodStrictRecord } from "../_utils/utils";
 
-export type AscensionLevel = (typeof ASCENSION_LEVELS)[number];
-export type AscensionLevelKey = `${AscensionLevel}`;
+const parsedItemSchema = z.object({
+  id: z.number(),
+  name: z.string(),
+  icon: z.string().url(),
+});
 
-/**
- * Mapping of ascension levels to their respective maximum servant levels.
- */
-export type AscensionMaxLevels = {
-  [level in AscensionLevelKey]: number;
-};
+const parsedItemAmountSchema = z.object({
+  item: parsedItemSchema,
+  amount: z.number(),
+});
+export type ParsedItemAmount = z.infer<typeof parsedItemAmountSchema>;
 
-export type SkillNum = (typeof SKILL_NUMBERS)[number] | null;
+const levelOrCostumeIDSchema = z.string();
+const parsedLvlUpMaterialsSchema = z.record(
+  levelOrCostumeIDSchema,
+  z.object({ items: z.array(parsedItemAmountSchema), qp: z.number() }),
+);
+export type ParsedLvlUpMaterials = z.infer<typeof parsedLvlUpMaterialsSchema>;
 
-export type ParsedSkill = {
-  num: SkillNum;
-  name: string;
-  detail: string;
-  icon: string;
-  cooldown: number[];
-};
+const ascensionLevelSchema = zodNumericEnum(ASCENSION_LEVELS);
+export type AscensionLevel = z.infer<typeof ascensionLevelSchema>;
 
-export type AppendSkillNum = (typeof APPEND_SKILL_NUMBERS)[number];
-export type AppendSkillNumKey = `${AppendSkillNum}`;
-export type ParsedAppendSkillData = {
-  name: string;
-  detail: string;
-  icon: string;
-  unlockMaterials: ParsedItemAmount[];
-} | null;
-export type ParsedAppendSkills = {
-  [key in AppendSkillNumKey]: ParsedAppendSkillData;
-};
+export const ascensionMaxLevelsRecordSchema = zodStrictRecord(
+  ascensionLevelSchema,
+  z.number(),
+);
+export type AscensionMaxLevels = z.infer<typeof ascensionMaxLevelsRecordSchema>;
 
-export interface ParsedItem {
-  id: number;
-  name: string;
-  icon: string;
-}
+const skillNumberSchema = zodNumericEnum(SKILL_NUMBERS);
+const parsedSkillSchema = z.object({
+  num: skillNumberSchema,
+  name: z.string(),
+  detail: z.string(),
+  icon: z.string().url(),
+  cooldown: z.array(z.number().int()),
+});
+export const parsedSkillArraySchema = z.array(parsedSkillSchema);
+export type ParsedSkills = z.infer<typeof parsedSkillArraySchema>;
 
-export interface ParsedItemAmount {
-  item: ParsedItem;
-  amount: number;
-}
+const appendSkillNumberSchema = zodNumericEnum(APPEND_SKILL_NUMBERS);
+const appendSkillSchema = z.object({
+  name: z.string(),
+  detail: z.string(),
+  icon: z.string().url(),
+  unlockMaterials: z.array(parsedItemAmountSchema),
+});
+export type ParsedAppendSkillData = z.infer<typeof appendSkillSchema>;
 
-export interface ParsedLvlUpMaterials {
-  [levelOrCostumeID: string]: {
-    items: ParsedItemAmount[];
-    qp: number;
-  };
-}
+export const parsedAppendSkillRecordSchema = zodStrictRecord(
+  appendSkillNumberSchema,
+  appendSkillSchema,
+);
+export type ParsedAppendSkills = z.infer<typeof parsedAppendSkillRecordSchema>;
 
-export interface ParsedServant {
+export const parsedServantSchema = z.object({
   /**
    * svt's internal ID. Note that this is different from the 1~300 IDs shown in
    * "Spirit Origin list", which is `.collectionNo`. This ID is unique accross
    * svt items (servants, CEs, EXPs, enemies, …)
    */
-  id: number;
+  id: z.number(),
   /**
    * The ID number shown in "Spirit Origin list". The community usually means
    * this number when they talk about servant or CE IDs.
    */
-  collectionNo: number;
-  name: string;
-  className: string;
-  atkBase: number;
-  hpBase: number;
+  collectionNo: z.number(),
+  name: z.string(),
+  className: z.string(),
+  atkBase: z.number(),
+  hpBase: z.number(),
   /**
    * ATK value per level, including grail levels.
    */
-  atkGrowth: number[];
+  atkGrowth: z.array(z.number()),
   /**
    * HP value per level, including grail levels.
    */
-  hpGrowth: number[];
+  hpGrowth: z.array(z.number()),
   /**
    * Total EXP needed per level. Equivalent to the "Accumulated EXP" value when feeding CE into another CE.
    */
-  expGrowth: number[];
-  ascensionLevels: AscensionMaxLevels;
-  ascensionMaterials: ParsedLvlUpMaterials;
-  skills: ParsedSkill[];
-  skillMaterials: ParsedLvlUpMaterials;
-  appendSkills: ParsedAppendSkills;
-  appendSkillMaterials: ParsedLvlUpMaterials;
-  costumeMaterials: ParsedLvlUpMaterials;
+  expGrowth: z.array(z.number()),
+  ascensionLevels: ascensionMaxLevelsRecordSchema,
+  ascensionMaterials: parsedLvlUpMaterialsSchema,
+  skills: parsedSkillArraySchema,
+  skillMaterials: parsedLvlUpMaterialsSchema,
+  appendSkills: parsedAppendSkillRecordSchema,
+  appendSkillMaterials: parsedLvlUpMaterialsSchema,
+  costumeMaterials: parsedLvlUpMaterialsSchema,
   /**
    * Face images for ascensions and costumes.
    */
-  faces: { [levelOrCostumeID: string]: string };
-}
+  faces: z.record(levelOrCostumeIDSchema, z.string()),
+});
+export type ParsedServant = z.infer<typeof parsedServantSchema>;
