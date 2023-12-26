@@ -634,21 +634,19 @@ export const Planner = () => {
   }, []);
 
   return (
-    <>
-      <Box sx={{ m: 1, overflow: "auto" }}>
-        {plannerState.map((svtInput) => {
-          return allServants ? (
-            <InputCard
-              key={svtInput.cardID}
-              allServants={allServants}
-              cardData={svtInput}
-              dispatch={dispatch}
-            />
-          ) : (
-            <div key={svtInput.cardID}>loading...</div>
-          );
-        })}
-      </Box>
-    </>
+    <Box>
+      {plannerState.map((svtInput) => {
+        return allServants ? (
+          <InputCard
+            key={svtInput.cardID}
+            allServants={allServants}
+            cardData={svtInput}
+            dispatch={dispatch}
+          />
+        ) : (
+          <div key={svtInput.cardID}>loading...</div>
+        );
+      })}
+    </Box>
   );
 };
