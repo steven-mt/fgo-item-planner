@@ -1,5 +1,11 @@
 import { AscensionLevel } from "../_types/servant";
 
+export const ATLAS_VERSION_URL = "https://api.atlasacademy.io/info";
+export const ATLAS_JP_SVT_URL =
+  "https://api.atlasacademy.io/export/JP/nice_servant_lang_en.json";
+export const ATLAS_NA_SVT_URL =
+  "https://api.atlasacademy.io/export/NA/nice_servant.json";
+
 export const MIN_SERVANT_LEVEL = 1 as const;
 export const MAX_SERVANT_LEVEL = 120 as const;
 

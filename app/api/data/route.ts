@@ -1,4 +1,4 @@
-import { getData } from "@/app/_services/atlasacademy/getData";
+import { getData } from "@/app/_services/atlasacademy/get-data";
 
 export async function GET() {
   const data = await getData();

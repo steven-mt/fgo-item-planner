@@ -2,7 +2,7 @@ import {
   NiceItemAmount,
   NiceLvlUpMaterial,
   NiceServant,
-} from "@/app/_types/apiNiceSvtTypes";
+} from "@/app/_types/atlas-nice-svt";
 import {
   ParsedItemAmount,
   ParsedLvlUpMaterials,
@@ -12,18 +12,13 @@ import {
   parsedServantSchema,
   parsedSkillArraySchema,
 } from "@/app/_types/servant";
-import { fetchWithRetry, isEmptyObject } from "@/app/_utils/utils";
-
-const jpAtlasSvtUrl =
-  "https://api.atlasacademy.io/export/JP/nice_servant_lang_en.json";
-const naAtlasSvtUrl = "https://api.atlasacademy.io/export/NA/nice_servant.json";
+import { ATLAS_JP_SVT_URL, ATLAS_NA_SVT_URL } from "@/app/_utils/constants";
+import { fetchWithRetry } from "@/app/_utils/utils";
 
 const fetchApiData = async (url: string) => {
   try {
     const response = await fetchWithRetry(url, 5, 1000, { cache: "no-store" });
     const data = await response.json();
-
-    if (isEmptyObject(data)) throw new Error("data is empty");
 
     return data;
   } catch (error) {
@@ -34,10 +29,14 @@ const fetchApiData = async (url: string) => {
   }
 };
 
-export const getData = async () => {
-  const jpAtlasServants = (await fetchApiData(jpAtlasSvtUrl)) as NiceServant[];
+export const getData = async (): Promise<ParsedServant[]> => {
+  const jpAtlasServants = (await fetchApiData(
+    ATLAS_JP_SVT_URL,
+  )) as NiceServant[];
 
-  const naAtlasServants = (await fetchApiData(naAtlasSvtUrl)) as NiceServant[];
+  const naAtlasServants = (await fetchApiData(
+    ATLAS_NA_SVT_URL,
+  )) as NiceServant[];
 
   const parseItemAmount = (
     niceItemAmountArray: NiceItemAmount[],
