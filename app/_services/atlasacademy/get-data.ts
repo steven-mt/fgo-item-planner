@@ -12,8 +12,8 @@ import {
   parsedServantSchema,
   parsedSkillArraySchema,
 } from "@/app/_types/servant";
+import { fetchWithRetry } from "@/app/_utils";
 import { ATLAS_JP_SVT_URL, ATLAS_NA_SVT_URL } from "@/app/_utils/constants";
-import { fetchWithRetry } from "@/app/_utils/utils";
 
 const fetchApiData = async (url: string) => {
   try {

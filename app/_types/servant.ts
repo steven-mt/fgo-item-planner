@@ -1,10 +1,10 @@
 import { z } from "zod";
+import { zodNumericEnum, zodStrictRecord } from "../_utils";
 import {
   APPEND_SKILL_NUMBERS,
   ASCENSION_LEVELS,
   SKILL_NUMBERS,
 } from "../_utils/constants";
-import { zodNumericEnum, zodStrictRecord } from "../_utils/utils";
 
 const parsedItemSchema = z.object({
   id: z.number(),

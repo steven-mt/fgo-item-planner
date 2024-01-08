@@ -1,5 +1,5 @@
 import { z } from "zod";
-import { zodStrictRecord } from "../_utils/utils";
+import { zodStrictRecord } from "../_utils";
 
 const regionSchema = z.enum(["JP", "NA", "CN", "KR", "TW"]);
 

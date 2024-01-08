@@ -1,10 +1,10 @@
-import { AtlasVersion } from "@/app/_types/atlas-version";
+import { atlasVersionSchema } from "@/app/_types/atlas-version";
+import { fetchWithRetry, getBaseUrl } from "@/app/_utils";
 import { ATLAS_VERSION_URL } from "@/app/_utils/constants";
-import { fetchWithRetry } from "@/app/_utils/utils";
 import { revalidatePath } from "next/cache";
 import { NextRequest } from "next/server";
 
-export const runtime = "edge";
+export const dynamic = "force-dynamic";
 
 export async function GET(request: NextRequest) {
   let hasRevalidated = false;
@@ -15,13 +15,13 @@ export async function GET(request: NextRequest) {
     return new Response("Unauthorized", { status: 401 });
   }
 
-  const cachedVersion: AtlasVersion = await (
-    await fetch("/api/atlas-version")
-  ).json();
+  const cachedVersion = atlasVersionSchema.parse(
+    await (await fetch(new URL("api/atlas-version", getBaseUrl()))).json(),
+  );
 
-  const newVersion: AtlasVersion = await (
-    await fetchWithRetry(ATLAS_VERSION_URL, 5, 1000)
-  ).json();
+  const newVersion = atlasVersionSchema.parse(
+    await (await fetchWithRetry(ATLAS_VERSION_URL, 5, 1000)).json(),
+  );
 
   if (newVersion.JP.timestamp > cachedVersion.JP.timestamp) {
     revalidatePath("/api/data");

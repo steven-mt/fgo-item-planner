@@ -1,6 +1,6 @@
 import { AtlasVersion, atlasVersionSchema } from "@/app/_types/atlas-version";
+import { fetchWithRetry } from "@/app/_utils";
 import { ATLAS_VERSION_URL } from "@/app/_utils/constants";
-import { fetchWithRetry } from "@/app/_utils/utils";
 
 export const getAtlasVersion = async (): Promise<AtlasVersion> => {
   const response = await fetchWithRetry(ATLAS_VERSION_URL, 5, 1000);
