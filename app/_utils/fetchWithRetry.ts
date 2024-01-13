@@ -44,5 +44,5 @@ export const fetchWithRetry = async (
     await timer(retryDelay);
   }
 
-  throw new Error("max fetch retries reached");
+  throw new Error("Max fetch retries reached");
 };
