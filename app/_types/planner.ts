@@ -28,8 +28,8 @@ export type CardData = EmptyCard | FilledCard;
 
 export type PlannerState = CardData[];
 
-export type ActionServantChange = "servantChange";
-export type ActionPriorityChange = "priorityChange";
+type ActionServantChange = "servantChange";
+type ActionPriorityChange = "priorityChange";
 export type ActionLevelChange = "levelFrom" | "levelTo";
 export type ActionAscensionChange = "ascensionFrom" | "ascensionTo";
 export type ActionSkillChange =
@@ -46,7 +46,7 @@ export type ActionAppendChange =
   | "append2To"
   | "append3From"
   | "append3To";
-export type ActionAddServant = "addServant";
+type ActionAddServant = "addServant";
 
 export type Action =
   | {
