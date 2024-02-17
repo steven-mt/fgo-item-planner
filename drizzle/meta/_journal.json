@@ -1,0 +1,20 @@
+{
+  "version": "5",
+  "dialect": "pg",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "5",
+      "when": 1708007581676,
+      "tag": "0000_light_the_twelve",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "5",
+      "when": 1708013021621,
+      "tag": "0001_black_landau",
+      "breakpoints": true
+    }
+  ]
+}

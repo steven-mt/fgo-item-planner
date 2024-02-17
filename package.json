@@ -7,7 +7,9 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "db:generate": "drizzle-kit generate:pg",
+    "db:migrate": "pnpm tsx db/migrate.ts"
   },
   "dependencies": {
     "@emotion/cache": "^11.11.0",
@@ -26,12 +28,15 @@
     "autoprefixer": "10.4.15",
     "axios": "^1.5.1",
     "clsx": "^2.0.0",
+    "dotenv": "^16.4.2",
+    "drizzle-orm": "^0.29.3",
     "eslint": "8.48.0",
     "eslint-config-next": "13.4.19",
     "hamburger-react": "^2.5.0",
     "next": "13.4.19",
     "object-sizeof": "^2.6.3",
     "postcss": "8.4.29",
+    "postgres": "^3.4.3",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-toggle-dark-mode": "^1.1.1",
@@ -40,10 +45,12 @@
     "zod": "^3.22.4"
   },
   "devDependencies": {
+    "drizzle-kit": "^0.20.12",
     "encoding": "^0.1.13",
     "json-schema-to-typescript": "^13.1.1",
     "prettier": "^3.0.3",
     "prettier-plugin-tailwindcss": "^0.5.3",
-    "supabase": "^1.93.0"
+    "supabase": "^1.93.0",
+    "tsx": "^4.7.1"
   }
 }
