@@ -20,7 +20,10 @@ type Props = { setIsModalOpen: Dispatch<SetStateAction<boolean>> };
 export const LoginProfileButton = ({ setIsModalOpen }: Props) => {
   const supabase = createClientComponentClient<Database>();
 
-  const { currentUser, setCurrentUser } = useUserContext();
+  const {
+    currentUser: { userData },
+    setCurrentUser,
+  } = useUserContext();
   const [userEmail, setUserEmail] = useState<string | undefined>(undefined);
 
   const [anchorEl, setAnchorEl] = useState<HTMLElement | null>(null);
@@ -33,16 +36,16 @@ export const LoginProfileButton = ({ setIsModalOpen }: Props) => {
     await supabase.auth.signOut();
     router.refresh();
 
-    setCurrentUser(null);
+    setCurrentUser({ authData: null, userData: null });
   };
 
   useEffect(() => {
-    if (currentUser) {
-      setUserEmail(currentUser.email);
+    if (userData) {
+      setUserEmail(userData.email);
     } else {
       setUserEmail(undefined);
     }
-  }, [currentUser]);
+  }, [userData]);
 
   const loginButton = (
     <Button
@@ -95,7 +98,7 @@ export const LoginProfileButton = ({ setIsModalOpen }: Props) => {
 
   return (
     <>
-      {currentUser ? profileIconButton : loginButton}
+      {userData ? profileIconButton : loginButton}
 
       {profileMenu}
     </>

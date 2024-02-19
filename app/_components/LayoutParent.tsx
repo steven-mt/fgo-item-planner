@@ -8,12 +8,8 @@ import {
   StyledEngineProvider,
   ThemeProvider,
 } from "@mui/material";
-import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
-import { useEffect } from "react";
 import { useLSTheme } from "../_hooks/useLSTheme";
-import { useUserContext } from "../_hooks/useUserContext";
 import { darkTheme, lightTheme } from "../_theme/theme";
-import { Database } from "../_types/supabase";
 import { Header } from "./Header";
 
 export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
@@ -29,23 +25,6 @@ export const LayoutParent = ({ children }: { children: React.ReactNode }) => {
     key: "css",
     prepend: true,
   });
-
-  const { setCurrentUser } = useUserContext();
-
-  const supabase = createClientComponentClient<Database>();
-
-  useEffect(() => {
-    const getUser = async () => {
-      const {
-        data: { session },
-      } = await supabase.auth.getSession();
-
-      if (session) setCurrentUser(session.user);
-      else setCurrentUser(null);
-    };
-
-    getUser();
-  }, [setCurrentUser, supabase.auth]);
 
   return (
     <>

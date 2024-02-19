@@ -19,10 +19,10 @@ export const insertUser = async (
   return insertedUsers.length === 0 ? null : insertedUsers[0];
 };
 
-export const getUser = async (id: string): Promise<UserSelect | undefined> => {
+export const getUser = async (id: string): Promise<UserSelect | null> => {
   const user = await db.select().from(users).where(eq(users.id, id));
 
-  return user[0];
+  return user.length === 0 ? null : user[0];
 };
 
 export const updateUserPlanner = async (

@@ -14,8 +14,10 @@ export const AccountForm = () => {
 
   const router = useRouter();
 
-  const { currentUser } = useUserContext();
-  const user = currentUser;
+  const {
+    currentUser: { authData },
+  } = useUserContext();
+  const user = authData;
 
   const getProfile = useCallback(async () => {
     if (!user) return;

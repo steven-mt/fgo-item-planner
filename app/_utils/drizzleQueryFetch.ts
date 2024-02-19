@@ -6,7 +6,7 @@ import {
 
 export const getUserFetch = async (
   userID: string,
-): Promise<UserSelect | undefined> => {
+): Promise<UserSelect | null> => {
   const response = await fetch("/api/getUser", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
