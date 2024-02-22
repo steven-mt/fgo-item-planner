@@ -69,4 +69,4 @@ export type Action =
     }
   | { type: ActionSkillChange; cardID: number; newSkillLevel: number | null }
   | { type: ActionAppendChange; cardID: number; newAppendLevel: number | null }
-  | { type: ActionAddServant };
+  | { type: ActionAddServant; newCardID: number };

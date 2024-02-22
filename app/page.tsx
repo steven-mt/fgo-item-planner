@@ -3,7 +3,6 @@
 import { Box } from "@mui/material";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect } from "react";
-import { AccountForm } from "./_components/AccountForm";
 import { Planner } from "./_components/Planner";
 import { useAppBarHeight } from "./_hooks/useAppBarHeight";
 import { useUserContext } from "./_hooks/useUserContext";
@@ -55,8 +54,6 @@ export default function Home() {
         height: `calc(100vh - ${useAppBarHeight()}px)`,
       }}
     >
-      <AccountForm />
-
       <Planner />
     </Box>
   );

@@ -8,6 +8,7 @@ import {
   MIN_ASCENSION_LEVEL,
   MIN_SERVANT_LEVEL,
 } from "@/app/_utils/constants";
+import { Add } from "@mui/icons-material";
 import {
   Autocomplete,
   Avatar,
@@ -15,6 +16,7 @@ import {
   Card,
   CardContent,
   Grid,
+  IconButton,
   TextField,
   Typography,
 } from "@mui/material";
@@ -42,10 +44,6 @@ const initialCardData: CardData = {
   append1: { from: null, to: null },
   append2: { from: null, to: null },
   append3: { from: null, to: null },
-};
-
-const getNewCardID = () => {
-  return 0;
 };
 
 const getAscensionFromLevel = (
@@ -92,7 +90,7 @@ const initialState: PlannerState = [initialCardData];
 const reducer = (state: PlannerState, action: Action): PlannerState => {
   switch (action.type) {
     case "addServant":
-      return [...state, { ...initialCardData, cardID: getNewCardID() }];
+      return [...state, { ...initialCardData, cardID: action.newCardID }];
     case "servantChange":
       return state.map((cardData) => {
         return cardData.cardID === action.cardID
@@ -617,7 +615,7 @@ const InputCard = ({
     </Card>
   );
 };
-
+// TODO: allow adding of more InputCards
 export const Planner = () => {
   const [plannerState, dispatch] = useReducer(reducer, initialState);
 
@@ -633,20 +631,61 @@ export const Planner = () => {
     getData();
   }, []);
 
-  return (
-    <Box>
-      {plannerState.map((svtInput) => {
-        return allServants ? (
+  const getNewCardID = (cardArray: PlannerState) => {
+    let newCardID = 0;
+
+    cardArray.forEach((cardData) => {
+      if (cardData.cardID === newCardID) newCardID++;
+    });
+
+    return newCardID;
+  };
+
+  return allServants ? (
+    <Grid container spacing={1}>
+      {plannerState.map((svtInput) => (
+        <Grid item key={svtInput.cardID} xs={12} sm={6}>
           <InputCard
             key={svtInput.cardID}
             allServants={allServants}
             cardData={svtInput}
             dispatch={dispatch}
           />
-        ) : (
-          <div key={svtInput.cardID}>loading...</div>
-        );
-      })}
-    </Box>
+        </Grid>
+      ))}
+
+      <Grid item xs={12} sm={6}>
+        <Card
+          sx={{
+            height: "100%",
+            display: "flex",
+            justifyContent: "center",
+          }}
+        >
+          <CardContent sx={{ alignSelf: "center" }}>
+            <IconButton
+              sx={{
+                backgroundColor: "primary.main",
+                "&:hover, &.Mui-focusVisible, &.Mui-active": {
+                  backgroundColor: "primary.main",
+                },
+              }}
+              onClick={() => {
+                dispatch({
+                  type: "addServant",
+                  newCardID: getNewCardID(plannerState),
+                });
+
+                console.log(plannerState);
+              }}
+            >
+              <Add />
+            </IconButton>
+          </CardContent>
+        </Card>
+      </Grid>
+    </Grid>
+  ) : (
+    <div>loading...</div>
   );
 };

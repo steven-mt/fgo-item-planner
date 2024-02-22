@@ -11,6 +11,7 @@ export const useLSTheme = (): [boolean, (value: boolean | null) => void] => {
     null,
   );
 
+  // TODO: get preference from db when possible
   useEffectOnce(() => {
     const prefersDark = window.matchMedia("(prefers-color-scheme:dark)");
 
