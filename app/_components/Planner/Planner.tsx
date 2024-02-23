@@ -19,9 +19,13 @@ import {
   IconButton,
   TextField,
   Typography,
+  useMediaQuery,
+  useTheme,
 } from "@mui/material";
 import Image from "next/image";
-import { useEffect, useReducer, useState } from "react";
+import React, { memo, useEffect, useReducer, useState } from "react";
+import AutoSizer from "react-virtualized-auto-sizer";
+import { FixedSizeList } from "react-window";
 import {
   AscensionLevel,
   AscensionMaxLevels,
@@ -366,256 +370,413 @@ const LevelInputSection = ({
   </Box>
 );
 
-const InputCard = ({
-  allServants,
-  cardData,
+const InputCard = memo(
+  ({
+    allServants,
+    cardData,
+    dispatch,
+  }: {
+    allServants: ParsedServant[];
+    cardData: CardData;
+    dispatch: React.Dispatch<Action>;
+  }) => {
+    const selectedServant = allServants.find(
+      (servant) => servant.id === cardData.servantID,
+    );
+    const currentSkills = selectedServant?.skills;
+    const currentAppendSkills = selectedServant?.appendSkills;
+
+    return (
+      <Card variant="outlined">
+        <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
+          <Box sx={{ display: "flex", gap: 1 }}>
+            <Avatar
+              variant="square"
+              src={selectedServant ? selectedServant.faces["1"] : ""}
+              sx={{ width: 90, height: 90 }}
+            />
+
+            <Box
+              sx={{
+                flex: 1,
+                display: "flex",
+                flexDirection: "column",
+                gap: 1,
+              }}
+            >
+              <Autocomplete
+                size="small"
+                autoComplete
+                autoHighlight
+                options={allServants}
+                getOptionLabel={(option) => option.name}
+                renderOption={(props, option) => (
+                  <Box
+                    {...props}
+                    key={option.id}
+                    component="li"
+                    sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
+                  >
+                    <Image
+                      key={option.id}
+                      src={option.faces[1]}
+                      width={32}
+                      height={32}
+                      alt=""
+                    />
+                    {option.name}
+                  </Box>
+                )}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Name"
+                    inputProps={{
+                      ...params.inputProps,
+                      autoComplete: "new-password",
+                    }}
+                  />
+                )}
+                onChange={(_event, value, _reason) => {
+                  value
+                    ? dispatch({
+                        type: "servantChange",
+                        cardID: cardData.cardID,
+                        newServantID: value.id,
+                        newAscensionLevels: value.ascensionLevels,
+                      })
+                    : dispatch({
+                        type: "servantChange",
+                        cardID: cardData.cardID,
+                        newServantID: value,
+                      });
+                }}
+              />
+
+              <Autocomplete
+                size="small"
+                options={["low", "high"]}
+                renderInput={(params) => (
+                  <TextField {...params} label="Priority" />
+                )}
+              />
+            </Box>
+          </Box>
+
+          <Grid container spacing={2}>
+            <Grid item xs={4} display="flex" flexDirection="column" gap={2}>
+              <Typography variant="body1" component="h6">
+                Level
+              </Typography>
+              <Box sx={{ display: "flex" }}>
+                <ServantLevelInput
+                  label="From"
+                  cardData={cardData}
+                  actionType="levelFrom"
+                  dispatch={dispatch}
+                />
+                <ServantLevelInput
+                  label="To"
+                  cardData={cardData}
+                  actionType="levelTo"
+                  dispatch={dispatch}
+                />
+              </Box>
+            </Grid>
+
+            <Grid item xs={4} display="flex" flexDirection="column" gap={2}>
+              <Typography variant="body1" component="h6">
+                Ascension
+              </Typography>
+              <Box sx={{ display: "flex" }}>
+                <AscensionLevelInput
+                  label="From"
+                  cardData={cardData}
+                  actionType="ascensionFrom"
+                  dispatch={dispatch}
+                />
+                <AscensionLevelInput
+                  label="To"
+                  cardData={cardData}
+                  actionType="ascensionTo"
+                  dispatch={dispatch}
+                />
+              </Box>
+            </Grid>
+
+            <Grid item xs={12}>
+              <LevelInputSection sectionLabel="Skills">
+                <Grid item xs={4} display="flex" flexDirection="row">
+                  <SkillLevelInput
+                    label="From"
+                    cardData={cardData}
+                    skills={currentSkills}
+                    actionType="skill1From"
+                    dispatch={dispatch}
+                  />
+                  <SkillLevelInput
+                    label="To"
+                    cardData={cardData}
+                    skills={currentSkills}
+                    actionType="skill1To"
+                    dispatch={dispatch}
+                  />
+                </Grid>
+
+                <Grid item xs={4} display="flex" flexDirection="row">
+                  <SkillLevelInput
+                    label="From"
+                    cardData={cardData}
+                    skills={currentSkills}
+                    actionType="skill2From"
+                    dispatch={dispatch}
+                  />
+                  <SkillLevelInput
+                    label="To"
+                    cardData={cardData}
+                    skills={currentSkills}
+                    actionType="skill2To"
+                    dispatch={dispatch}
+                  />
+                </Grid>
+
+                <Grid item xs={4} display="flex" flexDirection="row">
+                  <SkillLevelInput
+                    label="From"
+                    cardData={cardData}
+                    skills={currentSkills}
+                    actionType="skill3From"
+                    dispatch={dispatch}
+                  />
+                  <SkillLevelInput
+                    label="To"
+                    cardData={cardData}
+                    skills={currentSkills}
+                    actionType="skill3To"
+                    dispatch={dispatch}
+                  />
+                </Grid>
+              </LevelInputSection>
+            </Grid>
+
+            <Grid item xs={12}>
+              <LevelInputSection sectionLabel="Append Skills">
+                <Grid item xs={4} display="flex" flexDirection="row">
+                  <AppendLevelInput
+                    label="From"
+                    cardData={cardData}
+                    appendSkills={currentAppendSkills}
+                    actionType="append1From"
+                    dispatch={dispatch}
+                  />
+                  <AppendLevelInput
+                    label="To"
+                    cardData={cardData}
+                    appendSkills={currentAppendSkills}
+                    actionType="append1To"
+                    dispatch={dispatch}
+                  />
+                </Grid>
+
+                <Grid item xs={4} display="flex" flexDirection="row">
+                  <AppendLevelInput
+                    label="From"
+                    cardData={cardData}
+                    appendSkills={currentAppendSkills}
+                    actionType="append2From"
+                    dispatch={dispatch}
+                  />
+                  <AppendLevelInput
+                    label="To"
+                    cardData={cardData}
+                    appendSkills={currentAppendSkills}
+                    actionType="append2To"
+                    dispatch={dispatch}
+                  />
+                </Grid>
+
+                <Grid item xs={4} display="flex" flexDirection="row">
+                  <AppendLevelInput
+                    label="From"
+                    cardData={cardData}
+                    appendSkills={currentAppendSkills}
+                    actionType="append3From"
+                    dispatch={dispatch}
+                  />
+                  <AppendLevelInput
+                    label="To"
+                    cardData={cardData}
+                    appendSkills={currentAppendSkills}
+                    actionType="append3To"
+                    dispatch={dispatch}
+                  />
+                </Grid>
+              </LevelInputSection>
+            </Grid>
+          </Grid>
+
+          {/* TODO: add exp and mats */}
+        </CardContent>
+      </Card>
+    );
+  },
+);
+InputCard.displayName = "InputCard";
+
+const AddCard = ({
+  plannerState,
   dispatch,
 }: {
-  allServants: ParsedServant[];
-  cardData: CardData;
+  plannerState: PlannerState;
   dispatch: React.Dispatch<Action>;
 }) => {
-  const selectedServant = allServants.find(
-    (servant) => servant.id === cardData.servantID,
-  );
-  const currentSkills = selectedServant?.skills;
-  const currentAppendSkills = selectedServant?.appendSkills;
+  const getNewCardID = (cardArray: PlannerState) => {
+    let newCardID = 0;
+
+    cardArray.forEach((cardData) => {
+      if (cardData.cardID === newCardID) newCardID++;
+    });
+
+    return newCardID;
+  };
 
   return (
-    <Card variant="outlined">
-      <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
-        <Box sx={{ display: "flex", gap: 1 }}>
-          <Avatar
-            variant="square"
-            src={selectedServant ? selectedServant.faces["1"] : ""}
-            sx={{ width: 90, height: 90 }}
-          />
-
-          <Box
-            sx={{
-              flex: 1,
-              display: "flex",
-              flexDirection: "column",
-              gap: 1,
-            }}
-          >
-            <Autocomplete
-              size="small"
-              autoComplete
-              autoHighlight
-              options={allServants}
-              getOptionLabel={(option) => option.name}
-              renderOption={(props, option) => (
-                <Box
-                  {...props}
-                  key={option.id}
-                  component="li"
-                  sx={{ "& > img": { mr: 2, flexShrink: 0 } }}
-                >
-                  <Image
-                    key={option.id}
-                    src={option.faces[1]}
-                    width={32}
-                    height={32}
-                    alt=""
-                  />
-                  {option.name}
-                </Box>
-              )}
-              renderInput={(params) => (
-                <TextField
-                  {...params}
-                  label="Name"
-                  inputProps={{
-                    ...params.inputProps,
-                    autoComplete: "new-password",
-                  }}
-                />
-              )}
-              onChange={(_event, value, _reason) => {
-                value
-                  ? dispatch({
-                      type: "servantChange",
-                      cardID: cardData.cardID,
-                      newServantID: value.id,
-                      newAscensionLevels: value.ascensionLevels,
-                    })
-                  : dispatch({
-                      type: "servantChange",
-                      cardID: cardData.cardID,
-                      newServantID: value,
-                    });
-              }}
-            />
-
-            <Autocomplete
-              size="small"
-              options={["low", "high"]}
-              renderInput={(params) => (
-                <TextField {...params} label="Priority" />
-              )}
-            />
-          </Box>
-        </Box>
-
-        <Grid container spacing={2}>
-          <Grid item xs={4} display="flex" flexDirection="column" gap={2}>
-            <Typography variant="body1" component="h6">
-              Level
-            </Typography>
-            <Box sx={{ display: "flex" }}>
-              <ServantLevelInput
-                label="From"
-                cardData={cardData}
-                actionType="levelFrom"
-                dispatch={dispatch}
-              />
-              <ServantLevelInput
-                label="To"
-                cardData={cardData}
-                actionType="levelTo"
-                dispatch={dispatch}
-              />
-            </Box>
-          </Grid>
-
-          <Grid item xs={4} display="flex" flexDirection="column" gap={2}>
-            <Typography variant="body1" component="h6">
-              Ascension
-            </Typography>
-            <Box sx={{ display: "flex" }}>
-              <AscensionLevelInput
-                label="From"
-                cardData={cardData}
-                actionType="ascensionFrom"
-                dispatch={dispatch}
-              />
-              <AscensionLevelInput
-                label="To"
-                cardData={cardData}
-                actionType="ascensionTo"
-                dispatch={dispatch}
-              />
-            </Box>
-          </Grid>
-
-          <Grid item xs={12}>
-            <LevelInputSection sectionLabel="Skills">
-              <Grid item xs={4} display="flex" flexDirection="row">
-                <SkillLevelInput
-                  label="From"
-                  cardData={cardData}
-                  skills={currentSkills}
-                  actionType="skill1From"
-                  dispatch={dispatch}
-                />
-                <SkillLevelInput
-                  label="To"
-                  cardData={cardData}
-                  skills={currentSkills}
-                  actionType="skill1To"
-                  dispatch={dispatch}
-                />
-              </Grid>
-
-              <Grid item xs={4} display="flex" flexDirection="row">
-                <SkillLevelInput
-                  label="From"
-                  cardData={cardData}
-                  skills={currentSkills}
-                  actionType="skill2From"
-                  dispatch={dispatch}
-                />
-                <SkillLevelInput
-                  label="To"
-                  cardData={cardData}
-                  skills={currentSkills}
-                  actionType="skill2To"
-                  dispatch={dispatch}
-                />
-              </Grid>
-
-              <Grid item xs={4} display="flex" flexDirection="row">
-                <SkillLevelInput
-                  label="From"
-                  cardData={cardData}
-                  skills={currentSkills}
-                  actionType="skill3From"
-                  dispatch={dispatch}
-                />
-                <SkillLevelInput
-                  label="To"
-                  cardData={cardData}
-                  skills={currentSkills}
-                  actionType="skill3To"
-                  dispatch={dispatch}
-                />
-              </Grid>
-            </LevelInputSection>
-          </Grid>
-
-          <Grid item xs={12}>
-            <LevelInputSection sectionLabel="Append Skills">
-              <Grid item xs={4} display="flex" flexDirection="row">
-                <AppendLevelInput
-                  label="From"
-                  cardData={cardData}
-                  appendSkills={currentAppendSkills}
-                  actionType="append1From"
-                  dispatch={dispatch}
-                />
-                <AppendLevelInput
-                  label="To"
-                  cardData={cardData}
-                  appendSkills={currentAppendSkills}
-                  actionType="append1To"
-                  dispatch={dispatch}
-                />
-              </Grid>
-
-              <Grid item xs={4} display="flex" flexDirection="row">
-                <AppendLevelInput
-                  label="From"
-                  cardData={cardData}
-                  appendSkills={currentAppendSkills}
-                  actionType="append2From"
-                  dispatch={dispatch}
-                />
-                <AppendLevelInput
-                  label="To"
-                  cardData={cardData}
-                  appendSkills={currentAppendSkills}
-                  actionType="append2To"
-                  dispatch={dispatch}
-                />
-              </Grid>
-
-              <Grid item xs={4} display="flex" flexDirection="row">
-                <AppendLevelInput
-                  label="From"
-                  cardData={cardData}
-                  appendSkills={currentAppendSkills}
-                  actionType="append3From"
-                  dispatch={dispatch}
-                />
-                <AppendLevelInput
-                  label="To"
-                  cardData={cardData}
-                  appendSkills={currentAppendSkills}
-                  actionType="append3To"
-                  dispatch={dispatch}
-                />
-              </Grid>
-            </LevelInputSection>
-          </Grid>
-        </Grid>
-
-        {/* TODO: add exp and mats */}
+    <Card
+      sx={{
+        height: "100%",
+        display: "flex",
+        justifyContent: "center",
+      }}
+    >
+      <CardContent sx={{ alignSelf: "center" }}>
+        <IconButton
+          sx={{
+            backgroundColor: "primary.main",
+            "&:hover, &.Mui-focusVisible": {
+              backgroundColor: "primary.main",
+            },
+          }}
+          onClick={() => {
+            dispatch({
+              type: "addServant",
+              newCardID: getNewCardID(plannerState),
+            });
+          }}
+        >
+          <Add />
+        </IconButton>
       </CardContent>
     </Card>
   );
 };
-// TODO: allow adding of more InputCards
+
+// Virtualized grid of cards based on
+// https://github.com/kpennell/nytairbnbbucketlist/commit/101a32bb0555f3a7cc29151de195882b249972e8
+// from https://www.pluralsight.com/blog/data-professional/airnyt-react-virtualized-material-ui-cards-for-fast-lists
+
+const CARD_HEIGHT = 418;
+const ROW_GAP = 16;
+
+const Row = memo(
+  ({
+    data,
+    index,
+    style,
+  }: {
+    data: {
+      itemsPerRow: number;
+      plannerState: PlannerState;
+      allServants: ParsedServant[];
+      dispatch: React.Dispatch<Action>;
+    };
+    index: number;
+    style: React.CSSProperties;
+  }) => {
+    const { itemsPerRow, plannerState, allServants, dispatch } = data;
+
+    const items = [];
+    const fromIndex = index * itemsPerRow;
+    const toIndex = Math.min(fromIndex + itemsPerRow, plannerState.length + 1);
+
+    for (let i = fromIndex; i < toIndex; i++) {
+      if (i >= plannerState.length) break;
+
+      const svtInput = plannerState[i];
+
+      items.push(
+        <div key={i} className="h-fit flex-1 px-1">
+          <InputCard
+            allServants={allServants}
+            cardData={svtInput}
+            dispatch={dispatch}
+          />
+        </div>,
+      );
+    }
+
+    if (toIndex === plannerState.length + 1) {
+      items.push(
+        <div key={toIndex} className="h-full flex-1 px-1 py-2">
+          <AddCard
+            key={toIndex}
+            plannerState={plannerState}
+            dispatch={dispatch}
+          />
+        </div>,
+      );
+    }
+
+    return (
+      <>
+        <div style={style} className="flex items-center">
+          {items}
+        </div>
+      </>
+    );
+  },
+);
+Row.displayName = "Row";
+
+const CardGrid = ({
+  plannerState,
+  allServants,
+  dispatch,
+}: {
+  plannerState: PlannerState;
+  allServants: ParsedServant[];
+  dispatch: React.Dispatch<Action>;
+}) => {
+  const theme = useTheme();
+
+  const mdBreakpoint = useMediaQuery(theme.breakpoints.up("md"));
+
+  const itemsPerRow = mdBreakpoint ? 2 : 1;
+
+  return (
+    <>
+      <AutoSizer>
+        {({ height, width }) => {
+          const rowCount = Math.ceil((plannerState.length + 1) / itemsPerRow);
+
+          const itemData = { itemsPerRow, plannerState, allServants, dispatch };
+
+          return (
+            <FixedSizeList
+              height={height}
+              itemCount={rowCount}
+              itemData={itemData}
+              itemSize={CARD_HEIGHT + ROW_GAP}
+              width={width}
+            >
+              {Row}
+            </FixedSizeList>
+          );
+        }}
+      </AutoSizer>
+    </>
+  );
+};
+
 export const Planner = () => {
   const [plannerState, dispatch] = useReducer(reducer, initialState);
 
@@ -631,61 +792,17 @@ export const Planner = () => {
     getData();
   }, []);
 
-  const getNewCardID = (cardArray: PlannerState) => {
-    let newCardID = 0;
-
-    cardArray.forEach((cardData) => {
-      if (cardData.cardID === newCardID) newCardID++;
-    });
-
-    return newCardID;
-  };
-
-  return allServants ? (
-    <Grid container spacing={1}>
-      {plannerState.map((svtInput) => (
-        <Grid item key={svtInput.cardID} xs={12} sm={6}>
-          <InputCard
-            key={svtInput.cardID}
-            allServants={allServants}
-            cardData={svtInput}
-            dispatch={dispatch}
-          />
-        </Grid>
-      ))}
-
-      <Grid item xs={12} sm={6}>
-        <Card
-          sx={{
-            height: "100%",
-            display: "flex",
-            justifyContent: "center",
-          }}
-        >
-          <CardContent sx={{ alignSelf: "center" }}>
-            <IconButton
-              sx={{
-                backgroundColor: "primary.main",
-                "&:hover, &.Mui-focusVisible, &.Mui-active": {
-                  backgroundColor: "primary.main",
-                },
-              }}
-              onClick={() => {
-                dispatch({
-                  type: "addServant",
-                  newCardID: getNewCardID(plannerState),
-                });
-
-                console.log(plannerState);
-              }}
-            >
-              <Add />
-            </IconButton>
-          </CardContent>
-        </Card>
-      </Grid>
-    </Grid>
-  ) : (
-    <div>loading...</div>
+  return (
+    <>
+      {allServants ? (
+        <CardGrid
+          plannerState={plannerState}
+          allServants={allServants}
+          dispatch={dispatch}
+        />
+      ) : (
+        <div>loading...</div>
+      )}
+    </>
   );
 };
