@@ -8,7 +8,12 @@ import {
   MIN_ASCENSION_LEVEL,
   MIN_SERVANT_LEVEL,
 } from "@/app/_utils/constants";
-import { Add } from "@mui/icons-material";
+import {
+  Add,
+  Delete,
+  KeyboardArrowLeft,
+  KeyboardArrowRight,
+} from "@mui/icons-material";
 import {
   Autocomplete,
   Avatar,
@@ -18,6 +23,7 @@ import {
   Grid,
   IconButton,
   TextField,
+  Tooltip,
   Typography,
   useMediaQuery,
   useTheme,
@@ -95,6 +101,12 @@ const reducer = (state: PlannerState, action: Action): PlannerState => {
   switch (action.type) {
     case "addServant":
       return [...state, { ...initialCardData, cardID: action.newCardID }];
+    case "removeServant":
+      const result = state.filter(
+        (cardData) => cardData.cardID !== action.cardID,
+      );
+
+      return result;
     case "servantChange":
       return state.map((cardData) => {
         return cardData.cardID === action.cardID
@@ -502,6 +514,36 @@ const InputCard = memo(
                   dispatch={dispatch}
                 />
               </Box>
+            </Grid>
+
+            <Grid
+              item
+              xs={4}
+              display="flex"
+              flexDirection="column"
+              alignItems="center"
+            >
+              <div className="flex w-full justify-evenly">
+                <IconButton>
+                  <KeyboardArrowLeft />
+                </IconButton>
+                <IconButton>
+                  <KeyboardArrowRight />
+                </IconButton>
+              </div>
+
+              <Tooltip title="Remove">
+                <IconButton
+                  onClick={() => {
+                    dispatch({
+                      type: "removeServant",
+                      cardID: cardData.cardID,
+                    });
+                  }}
+                >
+                  <Delete />
+                </IconButton>
+              </Tooltip>
             </Grid>
 
             <Grid item xs={12}>

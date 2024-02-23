@@ -47,6 +47,7 @@ export type ActionAppendChange =
   | "append3From"
   | "append3To";
 type ActionAddServant = "addServant";
+type ActionRemoveServant = "removeServant";
 
 export type Action =
   | {
@@ -69,4 +70,5 @@ export type Action =
     }
   | { type: ActionSkillChange; cardID: number; newSkillLevel: number | null }
   | { type: ActionAppendChange; cardID: number; newAppendLevel: number | null }
-  | { type: ActionAddServant; newCardID: number };
+  | { type: ActionAddServant; newCardID: number }
+  | { type: ActionRemoveServant; cardID: number };
