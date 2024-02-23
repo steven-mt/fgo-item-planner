@@ -675,9 +675,15 @@ const AddCard = ({
   const getNewCardID = (cardArray: PlannerState) => {
     let newCardID = 0;
 
-    cardArray.forEach((cardData) => {
-      if (cardData.cardID === newCardID) newCardID++;
-    });
+    for (let index = 0; index < cardArray.length; index++) {
+      if (
+        cardArray.findIndex((cardData) => cardData.cardID === newCardID) === -1
+      ) {
+        break;
+      }
+
+      newCardID++;
+    }
 
     return newCardID;
   };
