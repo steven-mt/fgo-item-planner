@@ -16,7 +16,7 @@ export const MIN_ASCENSION_LEVEL = ASCENSION_LEVELS.reduce(
 
 export const MAX_ASCENSION_LEVEL = ASCENSION_LEVELS.reduce(
   (previousValue, currentValue) =>
-    previousValue < currentValue ? previousValue : currentValue,
+    previousValue > currentValue ? previousValue : currentValue,
 );
 
 export const MIN_SKILL_LEVEL = 1 as const;

@@ -77,19 +77,15 @@ const getAscensionFromLevel = (
 const getAscensionLevelLimits = (
   ascensionMap: AscensionMaxLevels,
   ascensionLevel: AscensionLevel,
-  minAscLevel: AscensionLevel,
-  maxAscLevel: AscensionLevel,
-  minServantLevel: number,
-  maxServantLevel: number,
 ) => {
   const minLevel =
-    ascensionLevel === minAscLevel
-      ? minServantLevel
+    ascensionLevel === MIN_ASCENSION_LEVEL
+      ? MIN_SERVANT_LEVEL
       : ascensionMap[(ascensionLevel - 1) as AscensionLevel];
 
   const maxLevel =
-    ascensionLevel === maxAscLevel
-      ? maxServantLevel
+    ascensionLevel === MAX_ASCENSION_LEVEL
+      ? MAX_SERVANT_LEVEL
       : ascensionMap[ascensionLevel];
 
   return { minLevel, maxLevel };
@@ -199,10 +195,6 @@ const reducer = (state: PlannerState, action: Action): PlannerState => {
           const { minLevel, maxLevel } = getAscensionLevelLimits(
             cardData.ascensionLevels,
             action.newAscensionLevel ?? MIN_ASCENSION_LEVEL,
-            MIN_ASCENSION_LEVEL,
-            MAX_ASCENSION_LEVEL,
-            MIN_SERVANT_LEVEL,
-            MAX_SERVANT_LEVEL,
           );
 
           // Only assign the minimum required level for the ascension if the
@@ -232,10 +224,6 @@ const reducer = (state: PlannerState, action: Action): PlannerState => {
           const { minLevel, maxLevel } = getAscensionLevelLimits(
             cardData.ascensionLevels,
             action.newAscensionLevel ?? MIN_ASCENSION_LEVEL,
-            MIN_ASCENSION_LEVEL,
-            MAX_ASCENSION_LEVEL,
-            MIN_SERVANT_LEVEL,
-            MAX_SERVANT_LEVEL,
           );
 
           if (!(currentLevel >= minLevel && currentLevel <= maxLevel))
