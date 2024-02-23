@@ -21,16 +21,19 @@ export const AscensionLevelInput = ({
   actionType: ActionAscensionChange;
   dispatch: React.Dispatch<Action>;
 }) => {
-  const inputValue =
+  const cardDataValue =
     actionType === "ascensionFrom"
       ? cardData.ascension.from
       : cardData.ascension.to;
 
-  const displayInputValue = inputValue !== null ? inputValue.toString() : "";
+  const displayValueFromCardData =
+    cardDataValue !== null ? cardDataValue.toString() : "";
 
-  let placeholder = inputValue ? inputValue.toString() : "0";
+  let placeholder = cardDataValue ? cardDataValue.toString() : "0";
 
-  const [displayValue, setDisplayValue] = useState<string>(displayInputValue);
+  const [displayValue, setDisplayValue] = useState<string>(
+    displayValueFromCardData,
+  );
 
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
@@ -72,8 +75,8 @@ export const AscensionLevelInput = ({
   const ascensionMapping = cardData.servantID ? cardData.ascensionLevels : null;
 
   useEffect(() => {
-    setDisplayValue(displayInputValue);
-  }, [displayInputValue]);
+    setDisplayValue(displayValueFromCardData);
+  }, [displayValueFromCardData]);
 
   return (
     <WideTooltip

@@ -398,6 +398,8 @@ const InputCard = memo(
     const currentSkills = selectedServant?.skills;
     const currentAppendSkills = selectedServant?.appendSkills;
 
+    const autocompleteValue = selectedServant ?? null;
+
     return (
       <Card variant="outlined">
         <CardContent sx={{ display: "flex", flexDirection: "column", gap: 2 }}>
@@ -420,6 +422,7 @@ const InputCard = memo(
                 size="small"
                 autoComplete
                 autoHighlight
+                value={autocompleteValue}
                 options={allServants}
                 getOptionLabel={(option) => option.name}
                 renderOption={(props, option) => (
@@ -449,18 +452,18 @@ const InputCard = memo(
                     }}
                   />
                 )}
-                onChange={(_event, value, _reason) => {
-                  value
+                onChange={(_event, newValue, _reason) => {
+                  newValue
                     ? dispatch({
                         type: "servantChange",
                         cardID: cardData.cardID,
-                        newServantID: value.id,
-                        newAscensionLevels: value.ascensionLevels,
+                        newServantID: newValue.id,
+                        newAscensionLevels: newValue.ascensionLevels,
                       })
                     : dispatch({
                         type: "servantChange",
                         cardID: cardData.cardID,
-                        newServantID: value,
+                        newServantID: newValue,
                       });
                 }}
               />

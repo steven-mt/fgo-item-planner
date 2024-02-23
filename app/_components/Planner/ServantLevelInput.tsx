@@ -18,12 +18,14 @@ export const ServantLevelInput = ({
   actionType: ActionLevelChange;
   dispatch: React.Dispatch<Action>;
 }) => {
-  const inputValue =
+  const cardDataValue =
     actionType === "levelFrom" ? cardData.level.from : cardData.level.to;
 
-  const displayInputValue = inputValue ? inputValue.toString() : "";
+  const displayValueFromCardData = cardDataValue
+    ? cardDataValue.toString()
+    : "";
 
-  const [displayValue, setDisplayValue] = useState(displayInputValue);
+  const [displayValue, setDisplayValue] = useState(displayValueFromCardData);
 
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
@@ -59,8 +61,8 @@ export const ServantLevelInput = ({
   const ascensionMapping = cardData.servantID ? cardData.ascensionLevels : null;
 
   useEffect(() => {
-    setDisplayValue(displayInputValue);
-  }, [displayInputValue]);
+    setDisplayValue(displayValueFromCardData);
+  }, [displayValueFromCardData]);
 
   return (
     <WideTooltip

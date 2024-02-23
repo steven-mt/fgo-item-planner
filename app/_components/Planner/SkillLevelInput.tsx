@@ -5,7 +5,7 @@ import { ParsedSkills } from "@/app/_types/servant";
 import { MAX_SKILL_LEVEL, MIN_SKILL_LEVEL } from "@/app/_utils/constants";
 import { Box, Typography } from "@mui/material";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { WideTooltip } from "../WideTooltip";
 import { BaseLevelInput } from "./BaseLevelInput";
 
@@ -22,31 +22,33 @@ export const SkillLevelInput = ({
   actionType: ActionSkillChange;
   dispatch: React.Dispatch<Action>;
 }) => {
-  let initialValue;
+  let cardDataValue: number | null;
   switch (actionType) {
     case "skill1From":
-      initialValue = cardData.skill1.from;
+      cardDataValue = cardData.skill1.from;
       break;
     case "skill1To":
-      initialValue = cardData.skill1.to;
+      cardDataValue = cardData.skill1.to;
       break;
     case "skill2From":
-      initialValue = cardData.skill2.from;
+      cardDataValue = cardData.skill2.from;
       break;
     case "skill2To":
-      initialValue = cardData.skill2.to;
+      cardDataValue = cardData.skill2.to;
       break;
     case "skill3From":
-      initialValue = cardData.skill3.from;
+      cardDataValue = cardData.skill3.from;
       break;
     case "skill3To":
-      initialValue = cardData.skill3.to;
+      cardDataValue = cardData.skill3.to;
       break;
   }
 
-  const [displayValue, setDisplayValue] = useState(
-    initialValue ? initialValue.toString() : "",
-  );
+  const displayValueFromCardData = cardDataValue
+    ? cardDataValue.toString()
+    : "";
+
+  const [displayValue, setDisplayValue] = useState(displayValueFromCardData);
 
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
@@ -131,6 +133,10 @@ export const SkillLevelInput = ({
     ) : (
       ""
     );
+
+  useEffect(() => {
+    setDisplayValue(displayValueFromCardData);
+  }, [displayValueFromCardData]);
 
   return (
     <WideTooltip title={tooltipDisplay} open={isTooltipOpen}>

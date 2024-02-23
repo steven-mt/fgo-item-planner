@@ -8,7 +8,7 @@ import {
 import { MAX_APPEND_LEVEL, MIN_APPEND_LEVEL } from "@/app/_utils/constants";
 import { Box, Typography } from "@mui/material";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { WideTooltip } from "../WideTooltip";
 import { BaseLevelInput } from "./BaseLevelInput";
 
@@ -25,31 +25,33 @@ export const AppendLevelInput = ({
   actionType: ActionAppendChange;
   dispatch: React.Dispatch<Action>;
 }) => {
-  let initialValue;
+  let cardDataValue;
   switch (actionType) {
     case "append1From":
-      initialValue = cardData.append1.from;
+      cardDataValue = cardData.append1.from;
       break;
     case "append1To":
-      initialValue = cardData.append1.to;
+      cardDataValue = cardData.append1.to;
       break;
     case "append2From":
-      initialValue = cardData.append2.from;
+      cardDataValue = cardData.append2.from;
       break;
     case "append2To":
-      initialValue = cardData.append2.to;
+      cardDataValue = cardData.append2.to;
       break;
     case "append3From":
-      initialValue = cardData.append3.from;
+      cardDataValue = cardData.append3.from;
       break;
     case "append3To":
-      initialValue = cardData.append3.to;
+      cardDataValue = cardData.append3.to;
       break;
   }
 
-  const [displayValue, setDisplayValue] = useState(
-    initialValue ? initialValue.toString() : "",
-  );
+  const displayValueFromCardData = cardDataValue
+    ? cardDataValue.toString()
+    : "";
+
+  const [displayValue, setDisplayValue] = useState(displayValueFromCardData);
 
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
 
@@ -106,6 +108,10 @@ export const AppendLevelInput = ({
   ) : (
     ""
   );
+
+  useEffect(() => {
+    setDisplayValue(displayValueFromCardData);
+  }, [displayValueFromCardData]);
 
   return (
     <WideTooltip title={tooltipDisplay} open={isTooltipOpen}>
