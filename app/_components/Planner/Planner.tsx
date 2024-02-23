@@ -727,6 +727,7 @@ const Row = memo(
   }: {
     data: {
       itemsPerRow: number;
+      totalItemCount: number;
       plannerState: PlannerState;
       allServants: ParsedServant[];
       dispatch: React.Dispatch<Action>;
@@ -734,11 +735,12 @@ const Row = memo(
     index: number;
     style: React.CSSProperties;
   }) => {
-    const { itemsPerRow, plannerState, allServants, dispatch } = data;
+    const { itemsPerRow, totalItemCount, plannerState, allServants, dispatch } =
+      data;
 
     const items = [];
     const fromIndex = index * itemsPerRow;
-    const toIndex = Math.min(fromIndex + itemsPerRow, plannerState.length + 1);
+    const toIndex = Math.min(fromIndex + itemsPerRow, totalItemCount);
 
     for (let i = fromIndex; i < toIndex; i++) {
       if (i >= plannerState.length) break;
@@ -756,9 +758,11 @@ const Row = memo(
       );
     }
 
-    if (toIndex === plannerState.length + 1) {
+    const widthClass = totalItemCount % 2 === 0 ? "flex-1" : "w-1/2";
+
+    if (toIndex === totalItemCount) {
       items.push(
-        <div key={toIndex} className="h-full flex-1 px-1 py-2">
+        <div key={toIndex} className={`h-full px-1 py-2 ${widthClass}`}>
           <AddCard
             key={toIndex}
             plannerState={plannerState}
@@ -779,7 +783,7 @@ const Row = memo(
 );
 Row.displayName = "Row";
 
-const CardGrid = ({
+const CardList = ({
   plannerState,
   allServants,
   dispatch,
@@ -788,6 +792,8 @@ const CardGrid = ({
   allServants: ParsedServant[];
   dispatch: React.Dispatch<Action>;
 }) => {
+  const totalItemCount = plannerState.length + 1;
+
   const theme = useTheme();
 
   const mdBreakpoint = useMediaQuery(theme.breakpoints.up("md"));
@@ -798,9 +804,15 @@ const CardGrid = ({
     <>
       <AutoSizer>
         {({ height, width }) => {
-          const rowCount = Math.ceil((plannerState.length + 1) / itemsPerRow);
+          const rowCount = Math.ceil(totalItemCount / itemsPerRow);
 
-          const itemData = { itemsPerRow, plannerState, allServants, dispatch };
+          const itemData = {
+            itemsPerRow,
+            totalItemCount,
+            plannerState,
+            allServants,
+            dispatch,
+          };
 
           return (
             <FixedSizeList
@@ -837,7 +849,7 @@ export const Planner = () => {
   return (
     <>
       {allServants ? (
-        <CardGrid
+        <CardList
           plannerState={plannerState}
           allServants={allServants}
           dispatch={dispatch}
