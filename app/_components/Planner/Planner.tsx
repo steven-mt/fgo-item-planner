@@ -103,6 +103,47 @@ const reducer = (state: PlannerState, action: Action): PlannerState => {
       );
 
       return result;
+    case "moveServant":
+      const cardIndex = state.findIndex(
+        (cardData) => cardData.cardID === action.cardID,
+      );
+
+      if (cardIndex === -1) return state;
+
+      switch (action.direction) {
+        case "forward":
+          if (cardIndex === state.length - 1) return state;
+
+          if (
+            state[cardIndex].servantID === null &&
+            state[cardIndex + 1].servantID === null
+          )
+            return state;
+
+          [state[cardIndex], state[cardIndex + 1]] = [
+            state[cardIndex + 1],
+            state[cardIndex],
+          ];
+
+          break;
+        case "backward":
+          if (cardIndex === 0) return state;
+
+          if (
+            state[cardIndex].servantID === null &&
+            state[cardIndex - 1].servantID === null
+          )
+            return state;
+
+          [state[cardIndex - 1], state[cardIndex]] = [
+            state[cardIndex],
+            state[cardIndex - 1],
+          ];
+
+          break;
+      }
+
+      return [...state];
     case "servantChange":
       return state.map((cardData) => {
         return cardData.cardID === action.cardID
@@ -515,10 +556,26 @@ const InputCard = memo(
               alignItems="center"
             >
               <div className="flex w-full justify-evenly">
-                <IconButton>
+                <IconButton
+                  onClick={() => {
+                    dispatch({
+                      type: "moveServant",
+                      cardID: cardData.cardID,
+                      direction: "backward",
+                    });
+                  }}
+                >
                   <KeyboardArrowLeft />
                 </IconButton>
-                <IconButton>
+                <IconButton
+                  onClick={() => {
+                    dispatch({
+                      type: "moveServant",
+                      cardID: cardData.cardID,
+                      direction: "forward",
+                    });
+                  }}
+                >
                   <KeyboardArrowRight />
                 </IconButton>
               </div>
