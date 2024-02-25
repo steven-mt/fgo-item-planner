@@ -780,7 +780,7 @@ const Row = memo(
     style,
   }: {
     data: {
-      itemsPerRow: number;
+      itemsPerRow: 1 | 2;
       totalItemCount: number;
       plannerState: PlannerState;
       allServants: ParsedServant[];
@@ -812,7 +812,7 @@ const Row = memo(
       );
     }
 
-    const widthClass = totalItemCount % 2 === 0 ? "flex-1" : "w-1/2";
+    const widthClass = itemsPerRow === 1 ? "flex-1" : "w-1/2";
 
     if (toIndex === totalItemCount) {
       items.push(
@@ -860,19 +860,17 @@ const CardList = ({
         {({ height, width }) => {
           const rowCount = Math.ceil(totalItemCount / itemsPerRow);
 
-          const itemData = {
-            itemsPerRow,
-            totalItemCount,
-            plannerState,
-            allServants,
-            dispatch,
-          };
-
           return (
             <FixedSizeList
               height={height}
               itemCount={rowCount}
-              itemData={itemData}
+              itemData={{
+                itemsPerRow,
+                totalItemCount,
+                plannerState,
+                allServants,
+                dispatch,
+              }}
               itemSize={CARD_HEIGHT + ROW_GAP}
               width={width}
             >

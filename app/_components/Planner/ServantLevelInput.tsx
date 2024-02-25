@@ -34,6 +34,7 @@ export const ServantLevelInput = ({
 
     const inputNumber = parseInt(event.target.value, 10);
 
+    // TODO: remove unnecessary re-renders by returning early if value is unchanged
     if (isNaN(inputNumber) || inputNumber < MIN_SERVANT_LEVEL) {
       dispatch({
         type: actionType,
