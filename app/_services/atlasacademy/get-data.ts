@@ -2,7 +2,7 @@ import {
   NiceItemAmount,
   NiceLvlUpMaterial,
   NiceServant,
-} from "@/app/_types/atlas-nice-svt";
+} from "@/app/_types/atlas-nice";
 import {
   ParsedItemAmount,
   ParsedLvlUpMaterials,

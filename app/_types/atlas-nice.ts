@@ -317,7 +317,14 @@ export type Trait =
   | "burnEffectivenessUp"
   | "murasamaAscension0"
   | "classUOlgaMarieFlare"
-  | "elementalsWrath";
+  | "elementalsWrath"
+  | "buffBuffSuccessRateUp"
+  | "groupServant"
+  | "takeruDummyTrait"
+  | "artsBuff"
+  | "busterBuff"
+  | "quickBuff"
+  | "FSNServant";
 /**
  * Condition Type Enum
  */
@@ -511,17 +518,33 @@ export type NiceCondType =
   | "svtLimitExchangeSvt"
   | "skillLvExchangeSvt"
   | "svtFriendshipExchangeSvt"
-  | "exchangeSvt";
+  | "exchangeSvt"
+  | "raidDamageAbove"
+  | "raidDamageBelow"
+  | "raidGroupDamageAbove"
+  | "raidGroupDamageBelow"
+  | "raidDamageRateAbove"
+  | "raidDamageRateBelow"
+  | "raidDamageRateNotAbove"
+  | "raidDamageRateNotBelow"
+  | "raidGroupDamageRateAbove"
+  | "raidGroupDamageRateBelow"
+  | "raidGroupDamageRateNotAbove"
+  | "raidGroupDamageRateNotBelow"
+  | "notQuestGroupClearNum"
+  | "raidGroupOpenAbove"
+  | "raidGroupOpenBelow"
+  | "treasureDeviceAccelerate"
+  | "playQuestPhase"
+  | "notPlayQuestPhase"
+  | "eventStartToEnd"
+  | "commonValueAbove"
+  | "commonValueBelow"
+  | "commonValueEqual";
 /**
  * Quest Type Enum
  */
-export type NiceQuestType =
-  | "main"
-  | "free"
-  | "friendship"
-  | "event"
-  | "heroballad"
-  | "warBoard";
+export type NiceQuestType = "main" | "free" | "friendship" | "event" | "heroballad" | "warBoard";
 /**
  * Quest Flag Enum
  */
@@ -589,12 +612,7 @@ export type NiceQuestFlag =
 /**
  * Quest After Clear Enum
  */
-export type NiceQuestAfterClearType =
-  | "close"
-  | "repeatFirst"
-  | "repeatLast"
-  | "resetInterval"
-  | "closeDisp";
+export type NiceQuestAfterClearType = "close" | "repeatFirst" | "repeatLast" | "resetInterval" | "closeDisp";
 /**
  * Consume Type Enum
  */
@@ -702,7 +720,8 @@ export type NiceFuncType =
   | "gainNpIndividualSum"
   | "setQuestRouteFlag"
   | "lastUsePlayerSkillCopy"
-  | "changeEnemyMasterFace";
+  | "changeEnemyMasterFace"
+  | "damageValueSafeOnce";
 /**
  * Function Target Type Enum
  */
@@ -913,16 +932,20 @@ export type NiceBuffType =
   | "commandattackAfterFunctionMainOnly"
   | "attackBeforeFunctionMainOnly"
   | "attackAfterFunctionMainOnly"
+  | "warBoardNotAttacked"
+  | "warBoardIgnoreDefeatpoint"
+  | "skillAfterFunction"
+  | "treasureDeviceAfterFunction"
+  | "skillAfterFunctionMainOnly"
+  | "treasureDeviceAfterFunctionMainOnly"
+  | "preventInvisibleWhenInstantDeath"
   | "toFieldChangeField"
   | "toFieldAvoidBuff"
   | "toFieldSubIndividualityField";
 /**
  * Class Relation Overwrite Type Enum
  */
-export type NiceClassRelationOverwriteType =
-  | "overwriteForce"
-  | "overwriteMoreThanTarget"
-  | "overwriteLessThanTarget";
+export type NiceClassRelationOverwriteType = "overwriteForce" | "overwriteMoreThanTarget" | "overwriteLessThanTarget";
 /**
  * Buff Convert Limit Type
  */
@@ -956,9 +979,27 @@ export type NiceSvtFlag =
   | "ignoreCombineLimitSpecial"
   | "svtEquipExp"
   | "svtEquipChocolate"
+  | "svtEquipManaExchange"
+  | "svtEquipCampaign"
+  | "svtEquipEvent"
+  | "svtEquipEventReward"
   | "normal"
   | "goetia"
-  | "matDropRateUpCe";
+  | "matDropRateUpCe"
+  | "unknown";
+/**
+ * Original Servant Flag Enum
+ */
+export type NiceSvtFlagOriginal =
+  | "onlyUseForNpc"
+  | "svtEquipFriendShip"
+  | "ignoreCombineLimitSpecial"
+  | "svtEquipExp"
+  | "svtEquipChocolate"
+  | "svtEquipManaExchange"
+  | "svtEquipCampaign"
+  | "svtEquipEvent"
+  | "svtEquipEventReward";
 /**
  * Servant Class
  */
@@ -1039,19 +1080,14 @@ export type SkillScriptCond =
   | "HP_VAL_LOWER"
   | "HP_PER_HIGHER"
   | "HP_PER_LOWER";
-export type EnemyDeathType = "escape" | "stand" | "effect" | "wait" | "energy";
+/**
+ * Svt Dead Type
+ */
+export type NiceSvtDeadType = "normal" | "escape" | "stand" | "effect" | "wait" | "energy" | "crystal";
 /**
  * Card Type Enum
  */
-export type NiceCardType =
-  | "none"
-  | "arts"
-  | "buster"
-  | "quick"
-  | "extra"
-  | "blank"
-  | "weak"
-  | "strength";
+export type NiceCardType = "none" | "arts" | "buster" | "quick" | "extra" | "blank" | "weak" | "strength";
 /**
  * Treasure Device Effect Flag
  */
@@ -1238,7 +1274,10 @@ export type NiceAiCond =
   | "countPlayerSkillEqualIncludeMasterSkill"
   | "totalTurnHigher"
   | "totalTurnLower"
-  | "totalTurnEqual";
+  | "totalTurnEqual"
+  | "checkWarBoardSquareIndividuality"
+  | "checkPtHigherNpgauge"
+  | "checkSelfHigherNpgauge";
 /**
  * AI Act Type Enum
  */
@@ -1305,6 +1344,10 @@ export type NiceGender = "male" | "female" | "unknown";
  */
 export type NiceCommandCardAttackType = "one" | "all";
 /**
+ * Servant Overwrite Type
+ */
+export type NiceServantOverwriteType = "treasureDevice";
+/**
  * Item Type Enum
  */
 export type NiceItemType =
@@ -1367,26 +1410,31 @@ export type NiceStatusRank =
   | "A++"
   | "A-"
   | "A+++"
+  | "A?"
   | "B"
   | "B+"
   | "B++"
   | "B-"
   | "B+++"
+  | "B?"
   | "C"
   | "C+"
   | "C++"
   | "C-"
   | "C+++"
+  | "C?"
   | "D"
   | "D+"
   | "D++"
   | "D-"
   | "D+++"
+  | "D?"
   | "E"
   | "E+"
   | "E++"
   | "E-"
   | "E+++"
+  | "E?"
   | "EX"
   | "?"
   | "None"
@@ -1394,12 +1442,7 @@ export type NiceStatusRank =
 /**
  * Servant Policy Enum
  */
-export type ServantPolicy =
-  | "none"
-  | "neutral"
-  | "lawful"
-  | "chaotic"
-  | "unknown";
+export type ServantPolicy = "none" | "neutral" | "lawful" | "chaotic" | "unknown";
 /**
  * Servant Personality Enum
  */
@@ -1481,6 +1524,10 @@ export type NiceVoiceCondType =
   | "unknown40"
   | "unknown";
 /**
+ * Battle Field Environment Grant Type
+ */
+export type NiceBattleFieldEnvironmentGrantType = "none" | "stage" | "function";
+/**
  * Shop Type Enum
  */
 export type NiceShopType =
@@ -1499,7 +1546,8 @@ export type NiceShopType =
   | "startUpSummon"
   | "shop13"
   | "tradeAp"
-  | "shop15";
+  | "shop15"
+  | "eventSvtEquip";
 /**
  * Pay Type Enum
  */
@@ -1586,36 +1634,25 @@ export type NiceEventType =
   | "combineCosutumeItem"
   | "myroomMultipleViewCampaign"
   | "interludeCampaign"
-  | "myroomPhotoCampaign";
+  | "myroomPhotoCampaign"
+  | "fortuneCampaign";
 /**
  * Event Overwrite Type Enum
  */
-export type NiceEventOverwriteType =
-  | "bgImage"
-  | "bgm"
-  | "name"
-  | "banner"
-  | "noticeBanner";
+export type NiceEventOverwriteType = "bgImage" | "bgm" | "name" | "banner" | "noticeBanner";
+/**
+ * Event Svt Type
+ */
+export type NiceEventSvtType = "none" | "join" | "condJoin" | "directJoin";
 /**
  * Event Reward Scene Flag
  */
-export type NiceEventRewardSceneFlag =
-  | "npcGuide"
-  | "isChangeSvtByChangedTab"
-  | "isHideTab";
+export type NiceEventRewardSceneFlag = "npcGuide" | "isChangeSvtByChangedTab" | "isHideTab";
 export type EventPointActivityObjectType = "questId" | "skillId" | "shopId";
 /**
  * Mission Type Enum
  */
-export type NiceMissionType =
-  | "none"
-  | "event"
-  | "weekly"
-  | "daily"
-  | "extra"
-  | "limited"
-  | "complete"
-  | "random";
+export type NiceMissionType = "none" | "event" | "weekly" | "daily" | "extra" | "limited" | "complete" | "random";
 /**
  * Mission Reward Type Enum
  */
@@ -1623,28 +1660,35 @@ export type NiceMissionRewardType = "gift" | "extra" | "set";
 /**
  * Mission Progress Type Enum
  */
-export type NiceMissionProgressType =
-  | "none"
-  | "regist"
-  | "openCondition"
-  | "start"
-  | "clear"
-  | "achieve";
+export type NiceMissionProgressType = "none" | "regist" | "openCondition" | "start" | "clear" | "achieve";
 /**
  * Mission Condition Detail Condition Link Type Enum
  */
-export type NiceDetailMissionCondLinkType =
-  | "eventStart"
-  | "missionStart"
-  | "masterMissionStart"
-  | "randomMissionStart";
+export type NiceDetailMissionCondLinkType = "eventStart" | "missionStart" | "masterMissionStart" | "randomMissionStart";
+/**
+ * War Board Stage Square Type
+ */
+export type NiceWarBoardStageSquareType = "normal" | "item" | "effect" | "treasure" | "wall";
+/**
+ * War Board Treasure Rarity
+ */
+export type NiceWarBoardTreasureRarity =
+  | "common"
+  | "rare"
+  | "srare"
+  | "commonPlus"
+  | "rarePlus"
+  | "srarePlus"
+  | "commonPlus2"
+  | "rarePlus2"
+  | "srarePlus2"
+  | "itemIcon"
+  | "itemIconPlus"
+  | "itemIconPlus2";
 /**
  * Event Fortification Work Type
  */
-export type NiceEventWorkType =
-  | "militsryAffairs"
-  | "internalAffairs"
-  | "farmming";
+export type NiceEventWorkType = "militsryAffairs" | "internalAffairs" | "farmming";
 /**
  * Servant Class Support Group Type
  */
@@ -1707,6 +1751,10 @@ export type NiceCombineAdjustTarget =
  */
 export type NiceEventCombineCalc = "addition" | "multiplication" | "fixedValue";
 /**
+ * Gacha Flag
+ */
+export type NiceGachaFlag = "pcMessage" | "bonusSelect";
+/**
  * NPC Servant Follower Flag
  */
 export type NiceNpcServantFollowerFlag =
@@ -1756,23 +1804,11 @@ export type NiceRestrictionType =
 /**
  * Restriction Range Type
  */
-export type NiceRestrictionRangeType =
-  | "none"
-  | "equal"
-  | "notEqual"
-  | "above"
-  | "below"
-  | "between";
+export type NiceRestrictionRangeType = "none" | "equal" | "notEqual" | "above" | "below" | "between";
 /**
  * Frequency Type
  */
-export type NiceFrequencyType =
-  | "once"
-  | "onceUntilReboot"
-  | "everyTime"
-  | "valentine"
-  | "everyTimeAfter"
-  | "none";
+export type NiceFrequencyType = "once" | "onceUntilReboot" | "everyTime" | "valentine" | "everyTimeAfter" | "none";
 export type StageLimitActType = "win" | "lose";
 /**
  * Spot Overwrite Type
@@ -1811,7 +1847,8 @@ export type NiceWarFlag =
   | "dispEarthPointWithoutMap"
   | "isWarIconFree"
   | "isWarIconCenter"
-  | "noticeBoard";
+  | "noticeBoard"
+  | "changeDispClosedMessage";
 /**
  * War Start Type Enum
  */
@@ -2105,6 +2142,13 @@ export interface BaseVals {
   TriggeredTargetHpRange?: string;
   TriggeredTargetHpRateRange?: string;
   ExcludeUnSubStateIndiv?: number;
+  ProgressTurnOnBoard?: number;
+  CheckTargetResurrectable?: number;
+  CancelTransform?: number;
+  UnSubStateWhenContinue?: number;
+  CheckTargetHaveDefeatPoint?: number;
+  NPFixedDamageValue?: number;
+  IgnoreShiftSafeDamage?: number;
   ApplySupportSvt?: number;
   Individuality?: number;
   EventId?: number;
@@ -2280,6 +2324,7 @@ export interface BasicServant {
   originalOverwriteName?: string;
   type: NiceSvtType;
   flag: NiceSvtFlag;
+  flags: NiceSvtFlagOriginal[];
   classId: number;
   className: SvtClass | string;
   attribute: Attribute;
@@ -2653,6 +2698,9 @@ export interface NiceBuff {
    * Random stuffs that get added to the buff entry. See each field description for more details.
    */
   script: BuffScript;
+  originalScript?: {
+    [k: string]: unknown;
+  };
   /**
    * Buff traits/individualities. For example, buff removal uses this field to target the buffs.
    */
@@ -2818,6 +2866,13 @@ export interface Vals {
   TriggeredTargetHpRange?: string;
   TriggeredTargetHpRateRange?: string;
   ExcludeUnSubStateIndiv?: number;
+  ProgressTurnOnBoard?: number;
+  CheckTargetResurrectable?: number;
+  CancelTransform?: number;
+  UnSubStateWhenContinue?: number;
+  CheckTargetHaveDefeatPoint?: number;
+  NPFixedDamageValue?: number;
+  IgnoreShiftSafeDamage?: number;
   ApplySupportSvt?: number;
   Individuality?: number;
   EventId?: number;
@@ -2830,7 +2885,7 @@ export interface Vals {
  * Slightly modified pydantic BaseModel that uses orjson for json methods
  */
 export interface EnemyScript {
-  deathType?: EnemyDeathType;
+  deathType?: NiceSvtDeadType;
   appear?: boolean;
   noVoice?: boolean;
   raid?: number;
@@ -3020,6 +3075,17 @@ export interface FieldAi {
   raid?: number;
   day?: number;
   id: number;
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface GachaStoryAdjust {
+  idx: number;
+  adjustId: number;
+  condType: NiceCondType;
+  targetId: number;
+  value: number;
+  imageId: number;
 }
 /**
  * Slightly modified pydantic BaseModel that uses orjson for json methods
@@ -3275,9 +3341,10 @@ export interface NiceServant {
    */
   type: NiceSvtType;
   /**
-   * Some random flags given to the svt items.
+   * [DEPRECATED] Use the `flags` field. Some random flags given to the svt items.
    */
   flag: NiceSvtFlag;
+  flags: NiceSvtFlagOriginal[];
   /**
    * svt's rarity.
    */
@@ -3412,6 +3479,7 @@ export interface NiceServant {
    */
   svtChange: NiceServantChange[];
   ascensionImage: NiceServantLimitImage[];
+  overwrites: NiceSvtOverwrite[];
   /**
    * Mapping <Ascension level, Materials to ascend servants>.
    */
@@ -3514,6 +3582,17 @@ export interface NiceServantLimitImage {
   condType: NiceCondType;
   condTargetId: number;
   condNum: number;
+}
+export interface NiceSvtOverwrite {
+  type: NiceServantOverwriteType;
+  priority: number;
+  condType: NiceCondType;
+  condTargetId: number;
+  condValue: number;
+  overwriteValue: NiceSvtOverwriteValue;
+}
+export interface NiceSvtOverwriteValue {
+  noblePhantasm?: NiceTd;
 }
 export interface NiceLvlUpMaterial {
   items: NiceItemAmount[];
@@ -3837,6 +3916,54 @@ export interface NiceTdReverse {
 /**
  * Slightly modified pydantic BaseModel that uses orjson for json methods
  */
+export interface NiceBattleBg {
+  id: number;
+  type: NiceBattleFieldEnvironmentGrantType;
+  priority: number;
+  individuality: NiceTrait[];
+  imageId: number;
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceBattleMasterImage {
+  id: number;
+  type: NiceGender;
+  faceIcon: string;
+  skillCutin: string;
+  skillCutinOffsetX: number;
+  skillCutinOffsetY: number;
+  commandSpellCutin: string;
+  commandSpellCutinOffsetX: number;
+  commandSpellCutinOffsetY: number;
+  resultImage: string;
+  releaseConditions: NiceCommonRelease[];
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceBattleMessage {
+  id: number;
+  idx: number;
+  priority: number;
+  releaseConditions: NiceCommonRelease[];
+  motionId: number;
+  message: string;
+  script: {
+    [k: string]: unknown;
+  };
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceBattleMessageGroup {
+  groupId: number;
+  probability: number;
+  messages: NiceBattleMessage[];
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
 export interface NiceBgm {
   id: number;
   name: string;
@@ -4002,6 +4129,9 @@ export interface NiceBuffReverse {
    * Random stuffs that get added to the buff entry. See each field description for more details.
    */
   script: BuffScript;
+  originalScript?: {
+    [k: string]: unknown;
+  };
   /**
    * Buff traits/individualities. For example, buff removal uses this field to target the buffs.
    */
@@ -4122,6 +4252,15 @@ export interface NiceClassBoardLine {
 /**
  * Slightly modified pydantic BaseModel that uses orjson for json methods
  */
+export interface NiceCompleteMission {
+  objectId: number;
+  presentMessageId: number;
+  gifts: NiceGift[];
+  bgm?: NiceBgm;
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
 export interface NiceEnemyMaster {
   id: number;
   name: string;
@@ -4169,9 +4308,10 @@ export interface NiceEquip {
    */
   type: NiceSvtType;
   /**
-   * Some random flags given to the svt items.
+   * [DEPRECATED] Use the `flags` field. Some random flags given to the svt items.
    */
   flag: NiceSvtFlag;
+  flags: NiceSvtFlagOriginal[];
   /**
    * svt's rarity.
    */
@@ -4274,6 +4414,7 @@ export interface NiceEvent {
   materialOpenedAt: number;
   warIds: number[];
   eventAdds: NiceEventAdd[];
+  svts: NiceEventSvt[];
   shop: NiceShop[];
   rewards: NiceEventReward[];
   rewardScenes: NiceEventRewardScene[];
@@ -4285,6 +4426,7 @@ export interface NiceEvent {
   missionGroups: NiceEventMissionGroup[];
   towers: NiceEventTower[];
   lotteries: NiceEventLottery[];
+  warBoards: NiceWarBoard[];
   treasureBoxes: NiceEventTreasureBox[];
   bulletinBoards: NiceEventBulletinBoard[];
   recipes: NiceEventRecipe[];
@@ -4315,6 +4457,38 @@ export interface NiceEventAdd {
   targetId: number;
   startedAt: number;
   endedAt: number;
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceEventSvt {
+  svtId: number;
+  script: NiceEventSvtScript;
+  originalScript: {
+    [k: string]: unknown;
+  };
+  type: NiceEventSvtType;
+  joinMessage: string;
+  getMessage: string;
+  leaveMessage: string;
+  name: string;
+  battleName: string;
+  releaseConditions: NiceCommonRelease[];
+  startedAt: number;
+  endedAt: number;
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceEventSvtScript {
+  addGetMessage?: string;
+  addMessageReleaseConditions?: NiceCommonRelease[];
+  isProtectedDuringEvent?: boolean;
+  joinQuestId?: number;
+  joinShopId?: number;
+  notPresentAnonymous?: boolean;
+  notPresentRarePri?: number;
+  ruby?: string;
 }
 /**
  * Slightly modified pydantic BaseModel that uses orjson for json methods
@@ -4521,6 +4695,41 @@ export interface NiceEventLotteryTalk {
   beforeVoiceLines: NiceVoiceLine[];
   afterVoiceLines: NiceVoiceLine[];
   isRare: boolean;
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceWarBoard {
+  warBoardId: number;
+  stages: NiceWarBoardStage[];
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceWarBoardStage {
+  warBoardStageId: number;
+  boardMessage: string;
+  formationCost: number;
+  questId: number;
+  questPhase: number;
+  squares: NiceWarBoardStageSquare[];
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceWarBoardStageSquare {
+  squareIndex: number;
+  type: NiceWarBoardStageSquareType;
+  effectId: number;
+  treasures: NiceWarBoardTreasure[];
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceWarBoardTreasure {
+  warBoardTreasureId: number;
+  rarity: NiceWarBoardTreasureRarity;
+  gifts: NiceGift[];
 }
 /**
  * Slightly modified pydantic BaseModel that uses orjson for json methods
@@ -4766,6 +4975,25 @@ export interface NiceFuncTypeDetail {
   funcType: NiceFuncType;
   ignoreValueUp: boolean;
 }
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceGacha {
+  id: number;
+  name: string;
+  imageId: number;
+  type: NicePayType;
+  adjustId: number;
+  pickupId: number;
+  drawNum1: number;
+  drawNum2: number;
+  maxDrawNum: number;
+  openedAt: number;
+  closedAt: number;
+  detailUrl: string;
+  flags: NiceGachaFlag[];
+  storyAdjusts: GachaStoryAdjust[];
+}
 export interface NiceMap {
   id: number;
   mapImage?: string;
@@ -4802,6 +5030,7 @@ export interface NiceMasterMission {
   endedAt: number;
   closedAt: number;
   missions: NiceEventMission[];
+  completeMission?: NiceCompleteMission;
   quests: BasicQuest[];
 }
 /**
@@ -4940,6 +5169,7 @@ export interface NiceQuestPhase {
   enemyHash?: string;
   availableEnemyHashes: string[];
   dropsFromAllHashes?: boolean;
+  battleBg?: NiceBattleBg;
   extraDetail: NiceQuestPhaseExtraDetail;
   scripts: ScriptLink[];
   messages: NiceQuestMessage[];
@@ -4961,6 +5191,7 @@ export interface NiceQuestPhaseExtraDetail {
   aiMultiNpc?: NiceQuestPhaseAiNpc[];
   overwriteEquipSkills?: NiceQuestPhaseOverwriteEquipSkills;
   waveSetup?: number;
+  masterImageId?: number;
 }
 /**
  * Slightly modified pydantic BaseModel that uses orjson for json methods
@@ -5135,14 +5366,17 @@ export interface SupportServantMisc {
 export interface NiceStage {
   wave: number;
   bgm: NiceBgm;
+  startEffectId: number;
   fieldAis?: FieldAi[];
   call?: number[];
   enemyFieldPosCount?: number;
   enemyActCount?: number;
   turn?: number;
   limitAct?: StageLimitActType;
+  battleBg?: NiceBattleBg;
   NoEntryIds?: number[];
   waveStartMovies?: NiceStageStartMovie[];
+  cutin?: NiceStageCutIn;
   originalScript: {
     [k: string]: unknown;
   };
@@ -5153,6 +5387,21 @@ export interface NiceStage {
  */
 export interface NiceStageStartMovie {
   waveStartMovie: string;
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceStageCutIn {
+  runs: number;
+  skills: NiceStageCutInSkill[];
+  drops: EnemyDrop[];
+}
+/**
+ * Slightly modified pydantic BaseModel that uses orjson for json methods
+ */
+export interface NiceStageCutInSkill {
+  skill: NiceSkill;
+  appearCount: number;
 }
 /**
  * Slightly modified pydantic BaseModel that uses orjson for json methods
@@ -5315,6 +5564,7 @@ export interface BasicEquip {
   originalName: string;
   type: NiceSvtType;
   flag: NiceSvtFlag;
+  flags: NiceSvtFlagOriginal[];
   rarity: number;
   atkMax: number;
   hpMax: number;
