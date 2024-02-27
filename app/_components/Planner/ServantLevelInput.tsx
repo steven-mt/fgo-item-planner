@@ -32,30 +32,42 @@ export const ServantLevelInput = ({
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     setIsTooltipOpen(false);
 
-    const inputNumber = parseInt(event.target.value, 10);
+    const inputNumber =
+      event.target.value === "" ? null : parseInt(event.target.value, 10);
 
-    // TODO: remove unnecessary re-renders by returning early if value is unchanged
-    if (isNaN(inputNumber) || inputNumber < MIN_SERVANT_LEVEL) {
+    if (inputNumber !== null && isNaN(inputNumber))
+      return setDisplayValue(displayValueFromCardData);
+
+    if (inputNumber === null || inputNumber < MIN_SERVANT_LEVEL) {
+      setDisplayValue("");
+
+      if (cardDataValue === null) return;
+
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
         newLevel: null,
       });
-      setDisplayValue("");
     } else if (inputNumber > MAX_SERVANT_LEVEL) {
+      setDisplayValue(MAX_SERVANT_LEVEL.toString());
+
+      if (cardDataValue === MAX_SERVANT_LEVEL) return;
+
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
         newLevel: MAX_SERVANT_LEVEL,
       });
-      setDisplayValue(MAX_SERVANT_LEVEL.toString());
     } else {
+      setDisplayValue(inputNumber.toString());
+
+      if (cardDataValue === inputNumber) return;
+
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
         newLevel: inputNumber,
       });
-      setDisplayValue(inputNumber.toString());
     }
   };
 

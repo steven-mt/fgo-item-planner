@@ -25,7 +25,7 @@ const parsedLvlUpMaterialsSchema = z.record(
 );
 export type ParsedLvlUpMaterials = z.infer<typeof parsedLvlUpMaterialsSchema>;
 
-const ascensionLevelSchema = zodNumericEnum(ASCENSION_LEVELS);
+export const ascensionLevelSchema = zodNumericEnum(ASCENSION_LEVELS);
 export type AscensionLevel = z.infer<typeof ascensionLevelSchema>;
 
 export const ascensionMaxLevelsRecordSchema = zodStrictRecord(

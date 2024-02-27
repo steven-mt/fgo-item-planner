@@ -55,29 +55,42 @@ export const SkillLevelInput = ({
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     setIsTooltipOpen(false);
 
-    const inputNumber = parseInt(event.target.value, 10);
+    const inputNumber =
+      event.target.value === "" ? null : parseInt(event.target.value, 10);
 
-    if (isNaN(inputNumber) || inputNumber < MIN_SKILL_LEVEL) {
+    if (inputNumber !== null && isNaN(inputNumber))
+      return setDisplayValue(displayValueFromCardData);
+
+    if (inputNumber === null || inputNumber < MIN_SKILL_LEVEL) {
+      setDisplayValue("");
+
+      if (cardDataValue === null) return;
+
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
         newSkillLevel: null,
       });
-      setDisplayValue("");
     } else if (inputNumber > MAX_SKILL_LEVEL) {
+      setDisplayValue(MAX_SKILL_LEVEL.toString());
+
+      if (cardDataValue === MAX_SKILL_LEVEL) return;
+
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
         newSkillLevel: MAX_SKILL_LEVEL,
       });
-      setDisplayValue(MAX_SKILL_LEVEL.toString());
     } else {
+      setDisplayValue(inputNumber.toString());
+
+      if (cardDataValue === inputNumber) return;
+
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
         newSkillLevel: inputNumber,
       });
-      setDisplayValue(inputNumber.toString());
     }
   };
 

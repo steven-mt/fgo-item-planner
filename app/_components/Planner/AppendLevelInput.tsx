@@ -25,7 +25,7 @@ export const AppendLevelInput = ({
   actionType: ActionAppendChange;
   dispatch: React.Dispatch<Action>;
 }) => {
-  let cardDataValue;
+  let cardDataValue: number | null;
   switch (actionType) {
     case "append1From":
       cardDataValue = cardData.append1.from;
@@ -59,29 +59,41 @@ export const AppendLevelInput = ({
     setIsTooltipOpen(false);
 
     const inputNumber =
-      event.target.value === "" ? NaN : parseInt(event.target.value, 10);
+      event.target.value === "" ? null : parseInt(event.target.value, 10);
 
-    if (isNaN(inputNumber) || inputNumber < MIN_APPEND_LEVEL) {
+    if (inputNumber !== null && isNaN(inputNumber))
+      return setDisplayValue(displayValueFromCardData);
+
+    if (inputNumber === null || inputNumber < MIN_APPEND_LEVEL) {
+      setDisplayValue("");
+
+      if (cardDataValue === null) return;
+
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
         newAppendLevel: MIN_APPEND_LEVEL,
       });
-      setDisplayValue("");
     } else if (inputNumber > MAX_APPEND_LEVEL) {
+      setDisplayValue(MAX_APPEND_LEVEL.toString());
+
+      if (cardDataValue === MAX_APPEND_LEVEL) return;
+
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
         newAppendLevel: MAX_APPEND_LEVEL,
       });
-      setDisplayValue(MAX_APPEND_LEVEL.toString());
     } else {
+      setDisplayValue(inputNumber.toString());
+
+      if (cardDataValue === inputNumber) return;
+
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
         newAppendLevel: inputNumber,
       });
-      setDisplayValue(inputNumber.toString());
     }
   };
 
