@@ -4,30 +4,16 @@ import {
   NiceServant,
 } from "@/app/_types/atlas-nice";
 import {
-  ParsedItemAmount,
-  ParsedLvlUpMaterials,
   ParsedServant,
+  SvtItemAmount,
+  SvtLvlUpMaterials,
   ascensionMaxLevelsRecordSchema,
   parsedAppendSkillRecordSchema,
   parsedServantSchema,
   parsedSkillArraySchema,
 } from "@/app/_types/servant";
-import { fetchWithRetry } from "@/app/_utils";
+import { fetchApiData } from "@/app/_utils";
 import { ATLAS_JP_SVT_URL, ATLAS_NA_SVT_URL } from "@/app/_utils/constants";
-
-const fetchApiData = async (url: string) => {
-  try {
-    const response = await fetchWithRetry(url, 5, 1000, { cache: "no-store" });
-    const data = await response.json();
-
-    return data;
-  } catch (error) {
-    console.group("Fetch API error: ");
-    if (error instanceof Error) console.log(error.message);
-    else console.log(error);
-    console.groupEnd();
-  }
-};
 
 export const getData = async (): Promise<ParsedServant[]> => {
   const jpAtlasServants = (await fetchApiData(
@@ -40,20 +26,16 @@ export const getData = async (): Promise<ParsedServant[]> => {
 
   const parseItemAmount = (
     niceItemAmountArray: NiceItemAmount[],
-  ): ParsedItemAmount[] => {
-    return niceItemAmountArray.map<ParsedItemAmount>((niceItemAmount) => ({
-      item: {
-        id: niceItemAmount.item.id,
-        name: niceItemAmount.item.name,
-        icon: niceItemAmount.item.icon,
-      },
+  ): SvtItemAmount[] => {
+    return niceItemAmountArray.map<SvtItemAmount>((niceItemAmount) => ({
+      id: niceItemAmount.item.id,
       amount: niceItemAmount.amount,
     }));
   };
 
   const parseSkillMaterials = (materials: {
     [k: string]: NiceLvlUpMaterial;
-  }): ParsedLvlUpMaterials => {
+  }): SvtLvlUpMaterials => {
     return Object.fromEntries(
       Object.entries(materials).map(([lvl, niceLvlUpMaterial]) => [
         lvl,
@@ -84,6 +66,7 @@ export const getData = async (): Promise<ParsedServant[]> => {
         collectionNo: atlasServant.collectionNo,
         name: atlasServant.name,
         className: atlasServant.className,
+        rarity: atlasServant.rarity,
         atkBase: atlasServant.atkBase,
         hpBase: atlasServant.hpBase,
         atkGrowth: atlasServant.atkGrowth,

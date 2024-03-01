@@ -6,24 +6,24 @@ import {
   SKILL_NUMBERS,
 } from "../_utils/constants";
 
-const parsedItemSchema = z.object({
+const svtItemAmountSchema = z.object({
   id: z.number(),
-  name: z.string(),
-  icon: z.string().url(),
-});
-
-const parsedItemAmountSchema = z.object({
-  item: parsedItemSchema,
   amount: z.number(),
 });
-export type ParsedItemAmount = z.infer<typeof parsedItemAmountSchema>;
+export type SvtItemAmount = z.infer<typeof svtItemAmountSchema>;
+
+const svtItemsAndQPSchema = z.object({
+  items: z.array(svtItemAmountSchema),
+  qp: z.number(),
+});
+export type SvtItemsAndQP = z.infer<typeof svtItemsAndQPSchema>;
 
 const levelOrCostumeIDSchema = z.string();
-const parsedLvlUpMaterialsSchema = z.record(
+const svtLvlUpMaterialsSchema = z.record(
   levelOrCostumeIDSchema,
-  z.object({ items: z.array(parsedItemAmountSchema), qp: z.number() }),
+  svtItemsAndQPSchema,
 );
-export type ParsedLvlUpMaterials = z.infer<typeof parsedLvlUpMaterialsSchema>;
+export type SvtLvlUpMaterials = z.infer<typeof svtLvlUpMaterialsSchema>;
 
 export const ascensionLevelSchema = zodNumericEnum(ASCENSION_LEVELS);
 export type AscensionLevel = z.infer<typeof ascensionLevelSchema>;
@@ -35,22 +35,24 @@ export const ascensionMaxLevelsRecordSchema = zodStrictRecord(
 export type AscensionMaxLevels = z.infer<typeof ascensionMaxLevelsRecordSchema>;
 
 const skillNumberSchema = zodNumericEnum(SKILL_NUMBERS);
-const parsedSkillSchema = z.object({
+const svtSkillSchema = z.object({
   num: skillNumberSchema,
   name: z.string(),
   detail: z.string(),
   icon: z.string().url(),
   cooldown: z.array(z.number().int()),
 });
-export const parsedSkillArraySchema = z.array(parsedSkillSchema);
+export const parsedSkillArraySchema = z.array(svtSkillSchema);
 export type ParsedSkills = z.infer<typeof parsedSkillArraySchema>;
 
 const appendSkillNumberSchema = zodNumericEnum(APPEND_SKILL_NUMBERS);
+export type AppendSkillNumber = z.infer<typeof appendSkillNumberSchema>;
+
 const appendSkillSchema = z.object({
   name: z.string(),
   detail: z.string(),
   icon: z.string().url(),
-  unlockMaterials: z.array(parsedItemAmountSchema),
+  unlockMaterials: z.array(svtItemAmountSchema),
 });
 export type ParsedAppendSkillData = z.infer<typeof appendSkillSchema>;
 
@@ -74,6 +76,7 @@ export const parsedServantSchema = z.object({
   collectionNo: z.number(),
   name: z.string(),
   className: z.string(),
+  rarity: z.number(),
   atkBase: z.number(),
   hpBase: z.number(),
   /**
@@ -89,12 +92,12 @@ export const parsedServantSchema = z.object({
    */
   expGrowth: z.array(z.number()),
   ascensionLevels: ascensionMaxLevelsRecordSchema,
-  ascensionMaterials: parsedLvlUpMaterialsSchema,
+  ascensionMaterials: svtLvlUpMaterialsSchema,
   skills: parsedSkillArraySchema,
-  skillMaterials: parsedLvlUpMaterialsSchema,
+  skillMaterials: svtLvlUpMaterialsSchema,
   appendSkills: parsedAppendSkillRecordSchema,
-  appendSkillMaterials: parsedLvlUpMaterialsSchema,
-  costumeMaterials: parsedLvlUpMaterialsSchema,
+  appendSkillMaterials: svtLvlUpMaterialsSchema,
+  costumeMaterials: svtLvlUpMaterialsSchema,
   /**
    * Face images for ascensions and costumes.
    */

@@ -1,3 +1,4 @@
+import { ExpCard, ParsedItem } from "./material";
 import { AscensionLevel, AscensionMaxLevels } from "./servant";
 
 export type Priority = null | "Low" | "Medium" | "High";
@@ -78,3 +79,13 @@ export type Action =
       cardID: number;
       direction: "forward" | "backward";
     };
+
+export interface Materials {
+  items: { item: ParsedItem; amount: number }[];
+  expCards: { card: ExpCard; amount: number }[];
+}
+
+export interface CardMaterials {
+  cardID: number;
+  materials: Materials;
+}

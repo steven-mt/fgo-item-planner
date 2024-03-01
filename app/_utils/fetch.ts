@@ -15,7 +15,6 @@
  *
  * @see https://developer.mozilla.org/docs/Web/API/fetch
  */
-
 export const fetchWithRetry = async (
   input: RequestInfo | URL,
   maxAttempts: number,
@@ -45,4 +44,13 @@ export const fetchWithRetry = async (
   }
 
   throw new Error("Max fetch retries reached");
+};
+
+export const fetchApiData = async (url: RequestInfo | URL) => {
+  const response = await fetchWithRetry(url, 5, 1000, {
+    cache: "no-store",
+  });
+  const data = await response.json();
+
+  return data;
 };

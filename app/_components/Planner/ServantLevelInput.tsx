@@ -1,7 +1,12 @@
 "use client";
 
 import { Action, ActionLevelChange, CardData } from "@/app/_types/planner";
-import { MAX_SERVANT_LEVEL, MIN_SERVANT_LEVEL } from "@/app/_utils/constants";
+import { ParsedServant } from "@/app/_types/servant";
+import {
+  MASH_SVT_ID,
+  MAX_SERVANT_LEVEL,
+  MIN_SERVANT_LEVEL,
+} from "@/app/_utils/constants";
 import React, { useEffect, useState } from "react";
 import { WideTooltip } from "../WideTooltip";
 import { AscensionLevelTable } from "./AscensionLevelTable";
@@ -9,11 +14,13 @@ import { BaseLevelInput } from "./BaseLevelInput";
 
 export const ServantLevelInput = ({
   cardData,
+  svtData,
   label,
   actionType,
   dispatch,
 }: {
   cardData: CardData;
+  svtData: ParsedServant | undefined;
   label: string;
   actionType: ActionLevelChange;
   dispatch: React.Dispatch<Action>;
@@ -28,6 +35,12 @@ export const ServantLevelInput = ({
   const [displayValue, setDisplayValue] = useState(displayValueFromCardData);
 
   const [isTooltipOpen, setIsTooltipOpen] = useState(false);
+
+  let maxSvtLvl: number = MAX_SERVANT_LEVEL;
+
+  // Mash has a unique level limit
+  if (svtData && svtData.id === MASH_SVT_ID)
+    maxSvtLvl = svtData.expGrowth.length;
 
   const handleBlur = (event: React.FocusEvent<HTMLInputElement>) => {
     setIsTooltipOpen(false);
@@ -48,15 +61,15 @@ export const ServantLevelInput = ({
         cardID: cardData.cardID,
         newLevel: null,
       });
-    } else if (inputNumber > MAX_SERVANT_LEVEL) {
-      setDisplayValue(MAX_SERVANT_LEVEL.toString());
+    } else if (inputNumber > maxSvtLvl) {
+      setDisplayValue(maxSvtLvl.toString());
 
-      if (cardDataValue === MAX_SERVANT_LEVEL) return;
+      if (cardDataValue === maxSvtLvl) return;
 
       dispatch({
         type: actionType,
         cardID: cardData.cardID,
-        newLevel: MAX_SERVANT_LEVEL,
+        newLevel: maxSvtLvl,
       });
     } else {
       setDisplayValue(inputNumber.toString());
