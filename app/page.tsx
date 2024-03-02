@@ -30,16 +30,17 @@ export default function Home() {
         if (!authUser.email)
           return alert("Missing email, database entry for user not created");
 
-        let insertedUser = await insertUserFetch({
-          id: authUser.id,
-          email: authUser.email,
-        });
+        let userData = await getUserFetch(authUser.id);
 
-        if (!insertedUser) insertedUser = await getUserFetch(authUser.id);
+        if (!userData)
+          userData = await insertUserFetch({
+            id: authUser.id,
+            email: authUser.email,
+          });
 
         setCurrentUser({
           authData: authUser,
-          userData: insertedUser,
+          userData: userData,
         });
       } else {
         setCurrentUser({ authData: null, userData: null });
