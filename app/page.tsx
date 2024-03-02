@@ -4,8 +4,9 @@ import { Box } from "@mui/material";
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useEffect, useState } from "react";
 import { Planner } from "./_components/Planner";
+import { PlannerStateProvider } from "./_context/PlannerStateProvider";
+import { useUserContext } from "./_context/useUserContext";
 import { useAppBarHeight } from "./_hooks/useAppBarHeight";
-import { useUserContext } from "./_hooks/useUserContext";
 import { ExpCard, GrailCost, ParsedItem } from "./_types/material";
 import { Database } from "./_types/supabase";
 import { insertUserFetch } from "./_utils";
@@ -85,17 +86,19 @@ export default function Home() {
         height: `calc(100vh - ${useAppBarHeight()}px)`,
       }}
     >
-      {!itemData && <div>loading item data...</div>}
-      {!expCardData && <div>loading exp card data...</div>}
-      {!grailCostData && <div>loading grail cost data...</div>}
+      <PlannerStateProvider>
+        {!itemData && <div>loading item data...</div>}
+        {!expCardData && <div>loading exp card data...</div>}
+        {!grailCostData && <div>loading grail cost data...</div>}
 
-      {expCardData && grailCostData && itemData && (
-        <Planner
-          itemData={itemData}
-          expCardData={expCardData}
-          grailCostData={grailCostData}
-        />
-      )}
+        {expCardData && grailCostData && itemData && (
+          <Planner
+            itemData={itemData}
+            expCardData={expCardData}
+            grailCostData={grailCostData}
+          />
+        )}
+      </PlannerStateProvider>
     </Box>
   );
 }

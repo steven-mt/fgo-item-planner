@@ -12,7 +12,7 @@ import {
 import { createClientComponentClient } from "@supabase/auth-helpers-nextjs";
 import { useRouter } from "next/navigation";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { useUserContext } from "../_hooks/useUserContext";
+import { useUserContext } from "../_context/useUserContext";
 import { Database } from "../_types/supabase";
 
 type Props = { setIsModalOpen: Dispatch<SetStateAction<boolean>> };
