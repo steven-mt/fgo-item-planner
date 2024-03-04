@@ -5,84 +5,31 @@ import {
   AppBar,
   Box,
   Button,
-  Divider,
-  Drawer,
   IconButton,
-  List,
-  ListItem,
-  ListItemButton,
-  ListItemText,
-  SwipeableDrawer,
   Toolbar,
   Tooltip,
   Typography,
 } from "@mui/material";
 import { Spin as HamburgerSpin } from "hamburger-react";
-import { useState } from "react";
+import { Dispatch, SetStateAction, useState } from "react";
 import { DarkModeSwitch } from "react-toggle-dark-mode";
 import { AuthModal } from "./AuthModal";
 import { LoginProfileButton } from "./LoginProfileButton";
 
-type Props = {
+export const Header = ({
+  isDark,
+  switchTheme,
+  isDrawerOpen,
+  setIsDrawerOpen,
+}: {
   isDark: boolean;
-  switchTheme: any;
-  drawerWidth: number;
-};
-
-type Page = "home" | "materials";
-
-export const Header = ({ isDark, switchTheme, drawerWidth }: Props) => {
-  const [isToggleDark, setIsToggleDark] = useState(false);
-
-  const navItems: Page[] = ["home", "materials"];
-  const optionItems = ["Help", "Settings"];
+  switchTheme: () => void;
+  isDrawerOpen: boolean;
+  setIsDrawerOpen: Dispatch<SetStateAction<boolean>>;
+}) => {
   const filterItems = ["filter1", "filter2"];
 
-  const [selectedPage, setSelectedPage] = useState<Page>("home");
-  const handleListItemClick = (page: Page) => {
-    setSelectedPage(page);
-  };
-
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-
-  const [isDrawerOpen, setIsDrawerOpen] = useState(false);
-  const handleDrawerToggle = () => setIsDrawerOpen((prevState) => !prevState);
-  const drawerContent = (
-    <Box sx={{ flex: 1, display: "flex", flexDirection: "column" }}>
-      <Toolbar />
-      <Divider />
-      <List>
-        {navItems.map((item) => (
-          <ListItem key={item} disablePadding>
-            <ListItemButton
-              selected={selectedPage === item}
-              onClick={() => handleListItemClick(item)}
-              sx={{ textAlign: "center" }}
-            >
-              <ListItemText primary={item} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-
-      <List
-        sx={{
-          flex: 1,
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "end",
-        }}
-      >
-        {optionItems.map((item) => (
-          <ListItem key={item} disablePadding>
-            <ListItemButton sx={{ textAlign: "center" }}>
-              <ListItemText primary={item} />
-            </ListItemButton>
-          </ListItem>
-        ))}
-      </List>
-    </Box>
-  );
 
   return (
     <>
@@ -141,48 +88,11 @@ export const Header = ({ isDark, switchTheme, drawerWidth }: Props) => {
               </Box>
             </Box>
 
-            <IconButton
-              onClick={() => {
-                switchTheme();
-                setIsToggleDark(!isToggleDark);
-              }}
-            >
+            <IconButton onClick={switchTheme}>
               <DarkModeSwitch checked={isDark} onChange={() => {}} />
             </IconButton>
           </Toolbar>
         </AppBar>
-
-        <Box component={"nav"}>
-          <SwipeableDrawer
-            open={isDrawerOpen}
-            onOpen={handleDrawerToggle}
-            onClose={handleDrawerToggle}
-            ModalProps={{ keepMounted: true }}
-            sx={{
-              display: { xs: "block", sm: "none" },
-              "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: drawerWidth,
-              },
-            }}
-          >
-            {drawerContent}
-          </SwipeableDrawer>
-
-          <Drawer
-            variant="permanent"
-            sx={{
-              display: { xs: "none", sm: "block" },
-              "& .MuiDrawer-paper": {
-                boxSizing: "border-box",
-                width: drawerWidth,
-              },
-            }}
-            open
-          >
-            {drawerContent}
-          </Drawer>
-        </Box>
 
         <AuthModal isModalOpen={isModalOpen} setIsModalOpen={setIsModalOpen} />
       </Box>

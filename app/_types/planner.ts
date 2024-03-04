@@ -1,5 +1,8 @@
+import { PAGE_ITEMS } from "../_utils/constants";
 import { ExpCard, ParsedItem } from "./material";
 import { AscensionLevel, AscensionMaxLevels } from "./servant";
+
+export type Page = (typeof PAGE_ITEMS)[number];
 
 export type Priority = null | "Low" | "Medium" | "High";
 

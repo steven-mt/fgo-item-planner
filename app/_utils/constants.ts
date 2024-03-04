@@ -1,3 +1,7 @@
+export const DRAWER_WIDTH = 240 as const;
+
+export const PAGE_ITEMS = ["Inputs", "Materials"] as const;
+
 export const ATLAS_VERSION_URL = "https://api.atlasacademy.io/info";
 export const ATLAS_JP_SVT_URL =
   "https://api.atlasacademy.io/export/JP/nice_servant_lang_en.json";
