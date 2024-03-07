@@ -1,11 +1,13 @@
 import { useContext } from "react";
-import { UserContext } from "./UserProvider";
+import { UserContext, UserProvider } from "./UserProvider";
 
 export const useUserContext = () => {
   const userContext = useContext(UserContext);
 
   if (userContext === undefined) {
-    throw new Error("useUserContext must be inside a UserProvider");
+    throw new Error(
+      `${useUserContext.name} must be inside a ${UserProvider.name}`,
+    );
   }
 
   return userContext;
