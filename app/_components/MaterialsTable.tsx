@@ -5,24 +5,75 @@ import {
   TableSortLabel,
   TextField,
   Typography,
+  TypographyProps,
 } from "@mui/material";
 import Image from "next/image";
 import { useState } from "react";
 import { Virtuoso } from "react-virtuoso";
+import { usePlannerStateContext } from "../_context/usePlannerStateContext";
 import { ParsedItem } from "../_types/material";
-import { Materials } from "../_types/planner";
+import { CardMaterials, MaterialUse } from "../_types/planner";
+import { ParsedServant } from "../_types/servant";
+
+interface RowSvtData {
+  id: number;
+  name: string;
+  icon: string;
+  uses: { [use in MaterialUse]?: number };
+}
+
+interface RowItem {
+  id: number;
+  name: string;
+  icon: string;
+  servantData: RowSvtData[];
+  totalAmount: number;
+}
+
+const HeaderTypography = ({
+  children,
+  props,
+}: {
+  props?: TypographyProps;
+  children: React.ReactNode;
+}) => (
+  <Typography
+    variant="body1"
+    overflow="auto"
+    textAlign="center"
+    whiteSpace="nowrap"
+    {...props}
+  >
+    {children}
+  </Typography>
+);
+
+const NumberTypography = ({
+  children,
+  props,
+}: {
+  children: React.ReactNode;
+  props?: TypographyProps;
+}) => {
+  return (
+    <Typography variant="body1" overflow="auto" textAlign="end" {...props}>
+      {children}
+    </Typography>
+  );
+};
 
 export const MaterialsTable = ({
+  allSvtData,
   itemData,
-  totalMats,
+  plannerMats,
 }: {
+  allSvtData: ParsedServant[];
   itemData: ParsedItem[];
-  totalMats: Materials;
+  plannerMats: CardMaterials[];
 }) => {
-  const rows: {
-    item: { id: number; name: string; icon: string };
-    amount: number;
-  }[] = [];
+  const { plannerState } = usePlannerStateContext();
+
+  const rowItems: RowItem[] = [];
 
   itemData.forEach((item) => {
     if (
@@ -32,27 +83,117 @@ export const MaterialsTable = ({
       !(50 <= item.id && item.id <= 5003)
       // exclude items for class score and code openers
     ) {
-      rows.push({ item: item, amount: 0 });
+      rowItems.push(
+        structuredClone({ ...item, servantData: [], totalAmount: 0 }),
+      );
     }
   });
 
-  totalMats.items.forEach((itemAndAmount) => {
-    const foundItemIndex = rows.findIndex(
-      (row) => row.item.id === itemAndAmount.item.id,
-    );
+  for (const cardMats of plannerMats) {
+    for (const cardItemAndAmount of cardMats.materials.items) {
+      const foundRow = rowItems.find(
+        (rowItem) => rowItem.id === cardItemAndAmount.item.id,
+      );
 
-    if (foundItemIndex !== -1) {
-      rows[foundItemIndex].amount += itemAndAmount.amount;
-    } else {
-      rows.push({ item: itemAndAmount.item, amount: itemAndAmount.amount });
+      let svtID: number | null = null;
+      for (const cardData of plannerState) {
+        if (cardData.cardID === cardMats.cardID) svtID = cardData.servantID;
+      }
+
+      const foundSvtData = allSvtData.find((svtData) => svtData.id === svtID);
+      if (foundSvtData === undefined) throw new Error("Servant data not found");
+
+      const newUses = cardItemAndAmount.uses;
+
+      if (foundRow === undefined) {
+        const newRowSvtData: RowSvtData[] = [];
+
+        newRowSvtData.push({
+          id: foundSvtData.id,
+          icon: foundSvtData.faces[1],
+          name: foundSvtData.name,
+          uses: newUses,
+        });
+
+        rowItems.push(
+          structuredClone({
+            id: cardItemAndAmount.item.id,
+            icon: cardItemAndAmount.item.icon,
+            name: cardItemAndAmount.item.name,
+            servantData: newRowSvtData,
+            totalAmount: cardItemAndAmount.totalAmount,
+          }),
+        );
+
+        continue;
+      }
+
+      // Item already exists in initial rows
+      const foundRowSvtData = foundRow.servantData.find(
+        (rowSvtData) => rowSvtData.id === svtID,
+      );
+
+      foundRow.totalAmount += cardItemAndAmount.totalAmount;
+
+      if (foundRowSvtData === undefined) {
+        foundRow.servantData.push(
+          structuredClone({
+            id: foundSvtData.id,
+            name: foundSvtData.name,
+            icon: foundSvtData.faces[1],
+            uses: newUses,
+          }),
+        );
+        continue;
+      }
+
+      const rowSvtUses = foundRowSvtData.uses;
+
+      let usesProperty: keyof typeof newUses;
+      for (usesProperty in newUses) {
+        const rowSvtUseAmount = rowSvtUses[usesProperty];
+        const newUseAmount = newUses[usesProperty];
+
+        if (newUseAmount === undefined) continue;
+        if (rowSvtUseAmount === undefined) {
+          rowSvtUses[usesProperty] = rowSvtUseAmount;
+          continue;
+        }
+        rowSvtUses[usesProperty] = rowSvtUseAmount + newUseAmount;
+      }
     }
-  });
+  }
 
-  totalMats.expCards.forEach((expCard) => {
-    rows.push({ item: expCard.card, amount: expCard.amount });
-  });
+  for (const cardMats of plannerMats) {
+    for (const cardItemAndAmount of cardMats.materials.expCards) {
+      let svtID: number | null = null;
+      for (const cardData of plannerState) {
+        if (cardData.cardID === cardMats.cardID) svtID = cardData.servantID;
+      }
+      const foundSvtData = allSvtData.find((svtData) => svtData.id === svtID);
 
-  rows.sort((a, b) => a.item.id - b.item.id);
+      const newRowSvtData: RowSvtData[] = [];
+      if (!foundSvtData) throw new Error("Servant data not found");
+      newRowSvtData.push({
+        id: foundSvtData.id,
+        icon: foundSvtData.faces[1],
+        name: foundSvtData.name,
+        uses: {},
+      });
+
+      rowItems.push(
+        structuredClone({
+          id: cardItemAndAmount.card.id,
+          icon: cardItemAndAmount.card.icon,
+          name: cardItemAndAmount.card.name,
+          servantData: newRowSvtData,
+          totalAmount: cardItemAndAmount.amount,
+        }),
+      );
+    }
+  }
+
+  rowItems.sort((a, b) => a.id - b.id);
 
   const [currentOpenIndex, setCurrentOpenIndex] = useState<number>(-1);
 
@@ -65,7 +206,7 @@ export const MaterialsTable = ({
           <TableSortLabel
             sx={{ width: "100%", display: "flex", justifyContent: "center" }}
           >
-            <Typography variant="body1">Item</Typography>
+            <HeaderTypography>Item</HeaderTypography>
           </TableSortLabel>
         </Grid>
 
@@ -73,7 +214,7 @@ export const MaterialsTable = ({
           <TableSortLabel
             sx={{ width: "100%", display: "flex", justifyContent: "center" }}
           >
-            <Typography variant="body1">Owned</Typography>
+            <HeaderTypography>Owned</HeaderTypography>
           </TableSortLabel>
         </Grid>
 
@@ -81,14 +222,14 @@ export const MaterialsTable = ({
           <TableSortLabel
             sx={{ width: "100%", display: "flex", justifyContent: "center" }}
           >
-            <Typography variant="body1">Total</Typography>
+            <HeaderTypography>Total</HeaderTypography>
           </TableSortLabel>
         </Grid>
       </Grid>
 
       <Virtuoso
         style={{ height: `calc(100% - ${HEADER_HEIGHT})` }}
-        data={rows}
+        data={rowItems}
         itemContent={(index, data) => (
           <>
             <Grid container alignItems="center">
@@ -103,12 +244,12 @@ export const MaterialsTable = ({
                   <div className="flex items-center gap-1">
                     <Image
                       alt="Icon image"
-                      src={data.item.icon}
+                      src={data.icon}
                       width={48}
                       height={48}
                     />
 
-                    <Typography variant="body1">{data.item.name}</Typography>
+                    <Typography variant="body1">{data.name}</Typography>
                   </div>
                 </CardActionArea>
               </Grid>
@@ -121,21 +262,98 @@ export const MaterialsTable = ({
                 />
               </Grid>
 
-              <Grid item xs={2}>
-                <Typography
-                  padding={1}
-                  variant="body1"
-                  width="100%"
-                  overflow="auto"
-                  textAlign="end"
-                >
-                  {data.amount}
-                </Typography>
+              <Grid item xs={2} padding={1}>
+                <NumberTypography>{data.totalAmount}</NumberTypography>
               </Grid>
             </Grid>
 
-            <Collapse in={index === currentOpenIndex} unmountOnExit>
-              placeholder text
+            <Collapse
+              in={index === currentOpenIndex}
+              unmountOnExit
+              sx={{
+                ".MuiCollapse-wrapperInner": {
+                  display: "flex",
+                  flexDirection: "column",
+                  gap: 1,
+                },
+              }}
+            >
+              <Grid container>
+                <Grid item xs={4}>
+                  <HeaderTypography>Servant</HeaderTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <HeaderTypography props={{ textAlign: "end" }}>
+                    Ascension
+                  </HeaderTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <HeaderTypography props={{ textAlign: "end" }}>
+                    Palingenesis
+                  </HeaderTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <HeaderTypography props={{ textAlign: "end" }}>
+                    Skills
+                  </HeaderTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <HeaderTypography props={{ textAlign: "end" }}>
+                    Append Skills
+                  </HeaderTypography>
+                </Grid>
+              </Grid>
+
+              {data.servantData.map((rowSvtData) => {
+                return (
+                  <Grid key={rowSvtData.id} container>
+                    <Grid
+                      item
+                      xs={4}
+                      display="flex"
+                      gap={1}
+                      alignItems="center"
+                    >
+                      <Image
+                        alt="Face icon"
+                        src={rowSvtData.icon}
+                        width={32}
+                        height={32}
+                      />
+
+                      <Typography variant="body1">{rowSvtData.name}</Typography>
+                    </Grid>
+
+                    <Grid item xs={2} paddingRight={1}>
+                      <NumberTypography>
+                        {rowSvtData.uses.ascension}
+                      </NumberTypography>
+                    </Grid>
+
+                    <Grid item xs={2} paddingRight={1}>
+                      <NumberTypography>
+                        {rowSvtData.uses.grail}
+                      </NumberTypography>
+                    </Grid>
+
+                    <Grid item xs={2} paddingRight={1}>
+                      <NumberTypography>
+                        {rowSvtData.uses.skill}
+                      </NumberTypography>
+                    </Grid>
+
+                    <Grid item xs={2} paddingRight={1}>
+                      <NumberTypography>
+                        {rowSvtData.uses.append}
+                      </NumberTypography>
+                    </Grid>
+                  </Grid>
+                );
+              })}
             </Collapse>
           </>
         )}

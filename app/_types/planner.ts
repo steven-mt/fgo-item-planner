@@ -83,12 +83,29 @@ export type Action =
       direction: "forward" | "backward";
     };
 
-export interface Materials {
-  items: { item: ParsedItem; amount: number }[];
+export type MaterialUse = "ascension" | "grail" | "skill" | "append";
+
+export type ItemRequirements = {
+  item: ParsedItem;
+  amount: number;
+  use: MaterialUse;
+}[];
+
+export type ExpRequirements = {
+  expCard: ExpCard;
+  amount: number;
+}[];
+
+export interface CombinedMaterials {
+  items: {
+    item: ParsedItem;
+    totalAmount: number;
+    uses: { [use in MaterialUse]?: number };
+  }[];
   expCards: { card: ExpCard; amount: number }[];
 }
 
 export interface CardMaterials {
   cardID: number;
-  materials: Materials;
+  materials: CombinedMaterials;
 }

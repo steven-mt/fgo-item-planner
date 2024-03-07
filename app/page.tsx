@@ -20,7 +20,13 @@ import { useAppBarHeight } from "./_hooks/useAppBarHeight";
 import { useLSTheme } from "./_hooks/useLSTheme";
 import { darkTheme, lightTheme } from "./_theme/theme";
 import { ExpCard, GrailCost, ParsedItem } from "./_types/material";
-import { CardMaterials, Materials, Page } from "./_types/planner";
+import {
+  CardMaterials,
+  CombinedMaterials,
+  ExpRequirements,
+  ItemRequirements,
+  Page,
+} from "./_types/planner";
 import { AppendSkillNumber, ParsedServant } from "./_types/servant";
 import { Database } from "./_types/supabase";
 import { insertUserFetch } from "./_utils";
@@ -38,47 +44,48 @@ import { getUserFetch } from "./_utils/drizzleQueryFetch";
 
 let didInit = false;
 
-const addMats = (newMats: Materials, matList: Materials) => {
-  const foundNewQPItem = newMats.items.find(
-    (newItem) => newItem.item.id === QP_ITEM_ID,
-  );
+const addMats = (
+  newMats: ItemRequirements | ExpRequirements,
+  combinedMats: CombinedMaterials,
+) => {
+  for (const newMaterial of newMats) {
+    if ("item" in newMaterial) {
+      const foundExistingItem = combinedMats.items.find(
+        (itemAndAmount) => itemAndAmount.item.id === newMaterial.item.id,
+      );
 
-  if (foundNewQPItem) {
-    matList.items.some((listItem, index) => {
-      if (listItem.item.id !== QP_ITEM_ID) return false;
+      if (foundExistingItem) {
+        foundExistingItem.totalAmount += newMaterial.amount;
 
-      matList.items[index].amount += foundNewQPItem.amount;
-    });
-  }
+        const existingUseAmount = foundExistingItem.uses[newMaterial.use];
 
-  newMats.expCards.forEach((newExpRequirement) => {
-    const foundExpCardIndex = matList.expCards.findIndex(
-      (expRequirement) => expRequirement.card.id === newExpRequirement.card.id,
-    );
+        foundExistingItem.uses[newMaterial.use] = existingUseAmount
+          ? existingUseAmount + newMaterial.amount
+          : newMaterial.amount;
 
-    if (foundExpCardIndex === -1) {
-      matList.expCards.push(newExpRequirement);
+        continue;
+      }
 
-      return;
+      combinedMats.items.push({
+        item: newMaterial.item,
+        totalAmount: newMaterial.amount,
+        uses: { [newMaterial.use]: newMaterial.amount },
+      });
+      continue;
     }
 
-    matList.expCards[foundExpCardIndex].amount += newExpRequirement.amount;
-  });
-
-  newMats.items.forEach((newItemAndAmount) => {
-    const foundItemAndAmount = matList.items.some(
-      (itemAndAmount, itemAndAmountIndex) => {
-        if (itemAndAmount.item.id !== newItemAndAmount.item.id) return false;
-
-        matList.items[itemAndAmountIndex].amount += newItemAndAmount.amount;
-        return true;
-      },
+    const foundExistingExp = combinedMats.expCards.find(
+      (expCard) => expCard.card.id === newMaterial.expCard.id,
     );
-
-    if (foundItemAndAmount) return;
-
-    matList.items.push(newItemAndAmount);
-  });
+    if (foundExistingExp) {
+      foundExistingExp.amount += newMaterial.amount;
+      continue;
+    }
+    combinedMats.expCards.push({
+      card: newMaterial.expCard,
+      amount: newMaterial.amount,
+    });
+  }
 };
 
 export default function Home() {
@@ -179,8 +186,8 @@ export default function Home() {
       expCardRarity: 4 | 5,
       from: number | null,
       to: number | null,
-    ): Materials => {
-      const materials: Materials = { items: [], expCards: [] };
+    ): ExpRequirements => {
+      const materials: ExpRequirements = [];
 
       if (!expCardData) return materials;
 
@@ -197,13 +204,14 @@ export default function Home() {
 
         const expCardID = expCardRarity === 4 ? EXP_4_ID : EXP_5_ID;
 
-        const expCard = expCardData.find((expcard) => expcard.id === expCardID);
-
-        if (expCard)
-          materials.expCards.push({
-            card: expCard,
-            amount: Math.ceil(expRequired / expCard.expFeed),
-          });
+        const foundExpCardData = expCardData.find(
+          (expcard) => expcard.id === expCardID,
+        );
+        if (!foundExpCardData) throw new Error("Exp card data not found");
+        materials.push({
+          expCard: foundExpCardData,
+          amount: Math.ceil(expRequired / foundExpCardData.expFeed), // without bonus
+        });
       }
 
       return materials;
@@ -216,8 +224,8 @@ export default function Home() {
       svtData: ParsedServant,
       from: number | null,
       to: number | null,
-    ): Materials => {
-      const materials: Materials = { items: [], expCards: [] };
+    ): ItemRequirements => {
+      const materials: ItemRequirements = [];
 
       if (!itemData || !grailCostData) return materials;
 
@@ -243,24 +251,35 @@ export default function Home() {
 
           const qpCost = grailLevel.qp;
           if (qpCost > 0) {
-            const foundItemData = itemData.find(
-              (item) => item.id === QP_ITEM_ID,
-            );
-            if (foundItemData)
-              materials.items.push({ item: foundItemData, amount: qpCost });
+            const foundQPData = itemData.find((item) => item.id === QP_ITEM_ID);
+            if (!foundQPData) throw new Error("QP item data not found");
+            materials.push({
+              item: foundQPData,
+              amount: qpCost,
+              use: "grail",
+            });
           }
 
-          const foundGrailItem = itemData.find(
+          const foundGrailData = itemData.find(
             (item) => item.id === GRAIL_ITEM_ID,
           );
-          if (foundGrailItem)
-            materials.items.push({ item: foundGrailItem, amount: 1 });
+          if (!foundGrailData) throw new Error("Grail item data not found");
+          materials.push({
+            item: foundGrailData,
+            amount: 1,
+            use: "grail",
+          });
 
           if (nextLvMax > 100) {
             const coinID = svtData.appendSkills[100].unlockMaterials[0].id;
-            const foundCoin = itemData.find((item) => item.id === coinID);
-            if (foundCoin)
-              materials.items.push({ item: foundCoin, amount: 30 });
+            const foundCoinData = itemData.find((item) => item.id === coinID);
+            if (!foundCoinData)
+              throw new Error("Servant coin item data not found");
+            materials.push({
+              item: foundCoinData,
+              amount: 30,
+              use: "grail",
+            });
           }
 
           if (nextLvMax >= toLevel) break;
@@ -276,8 +295,8 @@ export default function Home() {
       svtData: ParsedServant,
       from: number | null,
       to: number | null,
-    ): Materials => {
-      const materials: Materials = { items: [], expCards: [] };
+    ): ItemRequirements => {
+      const materials: ItemRequirements = [];
 
       if (!itemData) return materials;
 
@@ -295,22 +314,24 @@ export default function Home() {
             const foundItemData = itemData.find(
               (item) => item.id === newItem.id,
             );
-            if (foundItemData)
-              materials.items.push({
-                item: foundItemData,
-                amount: newItem.amount,
-              });
+            if (!foundItemData) throw new Error("Item data not found");
+            materials.push({
+              item: foundItemData,
+              amount: newItem.amount,
+              use: "ascension",
+            });
           });
 
           const qpCost = svtData.ascensionMaterials[index].qp;
 
           if (qpCost > 0) {
-            const foundItemData = itemData.find(
-              (item) => item.id === QP_ITEM_ID,
-            );
-
-            if (foundItemData)
-              materials.items.push({ item: foundItemData, amount: qpCost });
+            const foundQPData = itemData.find((item) => item.id === QP_ITEM_ID);
+            if (!foundQPData) throw new Error("QP item data not found");
+            materials.push({
+              item: foundQPData,
+              amount: qpCost,
+              use: "ascension",
+            });
           }
         }
       }
@@ -324,8 +345,8 @@ export default function Home() {
       svtData: ParsedServant,
       from: number | null,
       to: number | null,
-    ): Materials => {
-      const materials: Materials = { items: [], expCards: [] };
+    ): ItemRequirements => {
+      const materials: ItemRequirements = [];
 
       if (!itemData) return materials;
 
@@ -340,20 +361,23 @@ export default function Home() {
             const foundItemData = itemData.find(
               (item) => item.id === newItem.id,
             );
-            if (foundItemData)
-              materials.items.push({
-                item: foundItemData,
-                amount: newItem.amount,
-              });
+            if (!foundItemData) throw new Error("Item data not found");
+            materials.push({
+              item: foundItemData,
+              amount: newItem.amount,
+              use: "skill",
+            });
           });
 
           const qpCost = svtData.skillMaterials[index].qp;
           if (qpCost > 0) {
-            const foundItemData = itemData.find(
-              (item) => item.id === QP_ITEM_ID,
-            );
-            if (foundItemData)
-              materials.items.push({ item: foundItemData, amount: qpCost });
+            const foundQPData = itemData.find((item) => item.id === QP_ITEM_ID);
+            if (!foundQPData) throw new Error("QP item data not found");
+            materials.push({
+              item: foundQPData,
+              amount: qpCost,
+              use: "skill",
+            });
           }
         }
       }
@@ -369,8 +393,8 @@ export default function Home() {
       number: AppendSkillNumber,
       from: number | null,
       to: number | null,
-    ): Materials => {
-      const materials: Materials = { items: [], expCards: [] };
+    ): ItemRequirements => {
+      const materials: ItemRequirements = [];
 
       if (!itemData) return materials;
 
@@ -386,12 +410,12 @@ export default function Home() {
 
         svtData.appendSkills[number].unlockMaterials.forEach((newItem) => {
           const foundItemData = itemData.find((item) => item.id === newItem.id);
-
-          if (foundItemData)
-            materials.items.push({
-              item: foundItemData,
-              amount: newItem.amount,
-            });
+          if (!foundItemData) throw new Error("Item data not found");
+          materials.push({
+            item: foundItemData,
+            amount: newItem.amount,
+            use: "append",
+          });
         });
       }
 
@@ -401,20 +425,23 @@ export default function Home() {
             const foundItemData = itemData.find(
               (item) => item.id === newItem.id,
             );
-            if (foundItemData)
-              materials.items.push({
-                item: foundItemData,
-                amount: newItem.amount,
-              });
+            if (!foundItemData) throw new Error("Item data not found");
+            materials.push({
+              item: foundItemData,
+              amount: newItem.amount,
+              use: "append",
+            });
           });
 
           const qpCost = svtData.appendSkillMaterials[index].qp;
           if (qpCost > 0) {
-            const foundItemData = itemData.find(
-              (item) => item.id === QP_ITEM_ID,
-            );
-            if (foundItemData)
-              materials.items.push({ item: foundItemData, amount: qpCost });
+            const foundQPData = itemData.find((item) => item.id === QP_ITEM_ID);
+            if (!foundQPData) throw new Error("QP item data not found");
+            materials.push({
+              item: foundQPData,
+              amount: qpCost,
+              use: "append",
+            });
           }
         }
       }
@@ -426,7 +453,6 @@ export default function Home() {
   const { plannerState } = usePlannerStateContext();
 
   const plannerMats: CardMaterials[] = [];
-  const totalMats: Materials = { items: [], expCards: [] };
 
   if (allSvtData) {
     plannerState.forEach((cardData) => {
@@ -435,14 +461,10 @@ export default function Home() {
       const svtData = allSvtData.find((svt) => svt.id === cardData.servantID);
       if (!svtData) return;
 
-      const svtMats: Materials = { items: [], expCards: [] };
+      const svtMats: CombinedMaterials = { items: [], expCards: [] };
 
-      let newMats = getExpMats(
-        svtData,
-        5,
-        cardData.level.from,
-        cardData.level.to,
-      );
+      let newMats: ItemRequirements | ExpRequirements;
+      newMats = getExpMats(svtData, 5, cardData.level.from, cardData.level.to);
       addMats(newMats, svtMats);
 
       newMats = getAscensionMats(
@@ -488,8 +510,6 @@ export default function Home() {
         cardID: cardData.cardID,
         materials: svtMats,
       });
-
-      addMats(svtMats, totalMats);
     });
   }
 
@@ -541,7 +561,11 @@ export default function Home() {
                   )}
 
                   {selectedPage === "Materials" && (
-                    <MaterialsTable itemData={itemData} totalMats={totalMats} />
+                    <MaterialsTable
+                      allSvtData={allSvtData}
+                      itemData={itemData}
+                      plannerMats={plannerMats}
+                    />
                   )}
                 </>
               )}

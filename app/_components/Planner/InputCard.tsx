@@ -361,7 +361,7 @@ export const InputCard = memo(
                   return (
                     <Grid item xs={1.5} lg={1} key={index}>
                       <Badge
-                        badgeContent={itemAndAmount.amount}
+                        badgeContent={itemAndAmount.totalAmount}
                         anchorOrigin={{
                           vertical: "bottom",
                           horizontal: "right",
@@ -407,7 +407,7 @@ export const InputCard = memo(
                 {qpItem && (
                   <Grid item xs={3}>
                     <Badge
-                      badgeContent={qpItem.amount}
+                      badgeContent={qpItem.totalAmount}
                       anchorOrigin={{
                         vertical: "bottom",
                         horizontal: "right",
