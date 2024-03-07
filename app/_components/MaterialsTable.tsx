@@ -8,7 +8,7 @@ import {
   TypographyProps,
 } from "@mui/material";
 import Image from "next/image";
-import { useState } from "react";
+import { memo, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
 import { usePlannerStateContext } from "../_context/usePlannerStateContext";
 import { ParsedItem } from "../_types/material";
@@ -61,6 +61,138 @@ const NumberTypography = ({
     </Typography>
   );
 };
+
+const RowMainContent = memo(
+  ({
+    index,
+    data,
+    currentOpenIndex,
+    setCurrentOpenIndex,
+  }: {
+    index: number;
+    data: RowItem;
+    currentOpenIndex: number;
+    setCurrentOpenIndex: React.Dispatch<React.SetStateAction<number>>;
+  }) => {
+    return (
+      <>
+        <Grid container alignItems="center">
+          <Grid
+            item
+            xs={8}
+            onClick={() =>
+              setCurrentOpenIndex(currentOpenIndex === index ? -1 : index)
+            }
+          >
+            <CardActionArea>
+              <div className="flex items-center gap-1">
+                <Image
+                  alt="Icon image"
+                  src={data.icon}
+                  width={48}
+                  height={48}
+                />
+
+                <Typography variant="body1">{data.name}</Typography>
+              </div>
+            </CardActionArea>
+          </Grid>
+
+          <Grid item xs={2}>
+            {/* TODO: add owned materials */}
+            <TextField
+              size="small"
+              inputProps={{ style: { padding: 8 } }}
+              sx={{ minWidth: "2rem" }}
+            />
+          </Grid>
+
+          <Grid item xs={2} padding={1}>
+            <NumberTypography>{data.totalAmount}</NumberTypography>
+          </Grid>
+        </Grid>
+
+        <Collapse
+          in={index === currentOpenIndex}
+          unmountOnExit
+          sx={{
+            ".MuiCollapse-wrapperInner": {
+              display: "flex",
+              flexDirection: "column",
+              gap: 1,
+            },
+          }}
+        >
+          <Grid container>
+            <Grid item xs={4}>
+              <HeaderTypography>Servant</HeaderTypography>
+            </Grid>
+
+            <Grid item xs={2} paddingRight={1}>
+              <HeaderTypography props={{ textAlign: "end" }}>
+                Ascension
+              </HeaderTypography>
+            </Grid>
+
+            <Grid item xs={2} paddingRight={1}>
+              <HeaderTypography props={{ textAlign: "end" }}>
+                Palingenesis
+              </HeaderTypography>
+            </Grid>
+
+            <Grid item xs={2} paddingRight={1}>
+              <HeaderTypography props={{ textAlign: "end" }}>
+                Skills
+              </HeaderTypography>
+            </Grid>
+
+            <Grid item xs={2} paddingRight={1}>
+              <HeaderTypography props={{ textAlign: "end" }}>
+                Append Skills
+              </HeaderTypography>
+            </Grid>
+          </Grid>
+
+          {data.servantData.map((rowSvtData) => {
+            return (
+              <Grid key={rowSvtData.id} container>
+                <Grid item xs={4} display="flex" gap={1} alignItems="center">
+                  <Image
+                    alt="Face icon"
+                    src={rowSvtData.icon}
+                    width={32}
+                    height={32}
+                  />
+
+                  <Typography variant="body1">{rowSvtData.name}</Typography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <NumberTypography>
+                    {rowSvtData.uses.ascension}
+                  </NumberTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <NumberTypography>{rowSvtData.uses.grail}</NumberTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <NumberTypography>{rowSvtData.uses.skill}</NumberTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <NumberTypography>{rowSvtData.uses.append}</NumberTypography>
+                </Grid>
+              </Grid>
+            );
+          })}
+        </Collapse>
+      </>
+    );
+  },
+);
+RowMainContent.displayName = "row";
 
 export const MaterialsTable = ({
   allSvtData,
@@ -201,6 +333,7 @@ export const MaterialsTable = ({
 
   return (
     <>
+      {/* TODO: add sorting */}
       <Grid container paddingBottom={1}>
         <Grid item xs={8}>
           <TableSortLabel
@@ -231,131 +364,12 @@ export const MaterialsTable = ({
         style={{ height: `calc(100% - ${HEADER_HEIGHT})` }}
         data={rowItems}
         itemContent={(index, data) => (
-          <>
-            <Grid container alignItems="center">
-              <Grid
-                item
-                xs={8}
-                onClick={() =>
-                  setCurrentOpenIndex(currentOpenIndex === index ? -1 : index)
-                }
-              >
-                <CardActionArea>
-                  <div className="flex items-center gap-1">
-                    <Image
-                      alt="Icon image"
-                      src={data.icon}
-                      width={48}
-                      height={48}
-                    />
-
-                    <Typography variant="body1">{data.name}</Typography>
-                  </div>
-                </CardActionArea>
-              </Grid>
-
-              <Grid item xs={2}>
-                <TextField
-                  size="small"
-                  inputProps={{ style: { padding: 8 } }}
-                  sx={{ minWidth: "2rem" }}
-                />
-              </Grid>
-
-              <Grid item xs={2} padding={1}>
-                <NumberTypography>{data.totalAmount}</NumberTypography>
-              </Grid>
-            </Grid>
-
-            <Collapse
-              in={index === currentOpenIndex}
-              unmountOnExit
-              sx={{
-                ".MuiCollapse-wrapperInner": {
-                  display: "flex",
-                  flexDirection: "column",
-                  gap: 1,
-                },
-              }}
-            >
-              <Grid container>
-                <Grid item xs={4}>
-                  <HeaderTypography>Servant</HeaderTypography>
-                </Grid>
-
-                <Grid item xs={2} paddingRight={1}>
-                  <HeaderTypography props={{ textAlign: "end" }}>
-                    Ascension
-                  </HeaderTypography>
-                </Grid>
-
-                <Grid item xs={2} paddingRight={1}>
-                  <HeaderTypography props={{ textAlign: "end" }}>
-                    Palingenesis
-                  </HeaderTypography>
-                </Grid>
-
-                <Grid item xs={2} paddingRight={1}>
-                  <HeaderTypography props={{ textAlign: "end" }}>
-                    Skills
-                  </HeaderTypography>
-                </Grid>
-
-                <Grid item xs={2} paddingRight={1}>
-                  <HeaderTypography props={{ textAlign: "end" }}>
-                    Append Skills
-                  </HeaderTypography>
-                </Grid>
-              </Grid>
-
-              {data.servantData.map((rowSvtData) => {
-                return (
-                  <Grid key={rowSvtData.id} container>
-                    <Grid
-                      item
-                      xs={4}
-                      display="flex"
-                      gap={1}
-                      alignItems="center"
-                    >
-                      <Image
-                        alt="Face icon"
-                        src={rowSvtData.icon}
-                        width={32}
-                        height={32}
-                      />
-
-                      <Typography variant="body1">{rowSvtData.name}</Typography>
-                    </Grid>
-
-                    <Grid item xs={2} paddingRight={1}>
-                      <NumberTypography>
-                        {rowSvtData.uses.ascension}
-                      </NumberTypography>
-                    </Grid>
-
-                    <Grid item xs={2} paddingRight={1}>
-                      <NumberTypography>
-                        {rowSvtData.uses.grail}
-                      </NumberTypography>
-                    </Grid>
-
-                    <Grid item xs={2} paddingRight={1}>
-                      <NumberTypography>
-                        {rowSvtData.uses.skill}
-                      </NumberTypography>
-                    </Grid>
-
-                    <Grid item xs={2} paddingRight={1}>
-                      <NumberTypography>
-                        {rowSvtData.uses.append}
-                      </NumberTypography>
-                    </Grid>
-                  </Grid>
-                );
-              })}
-            </Collapse>
-          </>
+          <RowMainContent
+            index={index}
+            data={data}
+            currentOpenIndex={currentOpenIndex}
+            setCurrentOpenIndex={setCurrentOpenIndex}
+          />
         )}
       />
     </>
