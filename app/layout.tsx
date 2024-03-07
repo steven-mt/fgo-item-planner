@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
+import { PlannerStateProvider } from "./_context/PlannerStateProvider";
 import { UserProvider } from "./_context/UserProvider";
 import "./globals.css";
 
@@ -18,7 +19,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={inter.className}>
-        <UserProvider>{children}</UserProvider>
+        <UserProvider>
+          <PlannerStateProvider>{children}</PlannerStateProvider>
+        </UserProvider>
       </body>
     </html>
   );

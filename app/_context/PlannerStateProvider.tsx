@@ -1,3 +1,5 @@
+"use client";
+
 import { Dispatch, ReactNode, createContext, useMemo, useReducer } from "react";
 import { initialCardData } from "../_components/Planner/initial-data";
 import { reducer } from "../_components/Planner/reducer";
