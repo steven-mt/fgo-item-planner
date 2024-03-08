@@ -22,14 +22,14 @@ import { darkTheme, lightTheme } from "./_theme/theme";
 import { ExpCard, GrailCost, ParsedItem } from "./_types/material";
 import {
   CardMaterials,
-  CombinedMaterials,
+  CombinedRequirements,
   ExpRequirements,
   ItemRequirements,
   Page,
 } from "./_types/planner";
 import { AppendSkillNumber, ParsedServant } from "./_types/servant";
 import { Database } from "./_types/supabase";
-import { insertUserFetch } from "./_utils";
+import { getUserFetch, insertUserFetch } from "./_utils";
 import {
   EXP_4_ID,
   EXP_5_ID,
@@ -40,13 +40,12 @@ import {
   MIN_SKILL_LEVEL,
   QP_ITEM_ID,
 } from "./_utils/constants";
-import { getUserFetch } from "./_utils/drizzleQueryFetch";
 
 let didInit = false;
 
 const addMats = (
   newMats: ItemRequirements | ExpRequirements,
-  combinedMats: CombinedMaterials,
+  combinedMats: CombinedRequirements,
 ) => {
   for (const newMaterial of newMats) {
     if ("item" in newMaterial) {
@@ -252,7 +251,8 @@ export default function Home() {
           const qpCost = grailLevel.qp;
           if (qpCost > 0) {
             const foundQPData = itemData.find((item) => item.id === QP_ITEM_ID);
-            if (!foundQPData) throw new Error("QP item data not found");
+            if (!foundQPData)
+              throw new Error("QP item data not found, id: " + QP_ITEM_ID);
             materials.push({
               item: foundQPData,
               amount: qpCost,
@@ -263,7 +263,8 @@ export default function Home() {
           const foundGrailData = itemData.find(
             (item) => item.id === GRAIL_ITEM_ID,
           );
-          if (!foundGrailData) throw new Error("Grail item data not found");
+          if (!foundGrailData)
+            throw new Error("Grail item data not found, id: " + GRAIL_ITEM_ID);
           materials.push({
             item: foundGrailData,
             amount: 1,
@@ -274,7 +275,9 @@ export default function Home() {
             const coinID = svtData.appendSkills[100].unlockMaterials[0].id;
             const foundCoinData = itemData.find((item) => item.id === coinID);
             if (!foundCoinData)
-              throw new Error("Servant coin item data not found");
+              throw new Error(
+                "Servant coin item data not found, id: " + coinID,
+              );
             materials.push({
               item: foundCoinData,
               amount: 30,
@@ -314,7 +317,8 @@ export default function Home() {
             const foundItemData = itemData.find(
               (item) => item.id === newItem.id,
             );
-            if (!foundItemData) throw new Error("Item data not found");
+            if (!foundItemData)
+              throw new Error("Item data not found, id: " + newItem.id);
             materials.push({
               item: foundItemData,
               amount: newItem.amount,
@@ -326,7 +330,8 @@ export default function Home() {
 
           if (qpCost > 0) {
             const foundQPData = itemData.find((item) => item.id === QP_ITEM_ID);
-            if (!foundQPData) throw new Error("QP item data not found");
+            if (!foundQPData)
+              throw new Error("QP item data not found, id: " + QP_ITEM_ID);
             materials.push({
               item: foundQPData,
               amount: qpCost,
@@ -361,7 +366,8 @@ export default function Home() {
             const foundItemData = itemData.find(
               (item) => item.id === newItem.id,
             );
-            if (!foundItemData) throw new Error("Item data not found");
+            if (!foundItemData)
+              throw new Error("Item data not found, id: " + newItem.id);
             materials.push({
               item: foundItemData,
               amount: newItem.amount,
@@ -372,7 +378,8 @@ export default function Home() {
           const qpCost = svtData.skillMaterials[index].qp;
           if (qpCost > 0) {
             const foundQPData = itemData.find((item) => item.id === QP_ITEM_ID);
-            if (!foundQPData) throw new Error("QP item data not found");
+            if (!foundQPData)
+              throw new Error("QP item data not found, id: " + QP_ITEM_ID);
             materials.push({
               item: foundQPData,
               amount: qpCost,
@@ -410,7 +417,8 @@ export default function Home() {
 
         svtData.appendSkills[number].unlockMaterials.forEach((newItem) => {
           const foundItemData = itemData.find((item) => item.id === newItem.id);
-          if (!foundItemData) throw new Error("Item data not found");
+          if (!foundItemData)
+            throw new Error("Item data not found, id: " + newItem.id);
           materials.push({
             item: foundItemData,
             amount: newItem.amount,
@@ -425,7 +433,8 @@ export default function Home() {
             const foundItemData = itemData.find(
               (item) => item.id === newItem.id,
             );
-            if (!foundItemData) throw new Error("Item data not found");
+            if (!foundItemData)
+              throw new Error("Item data not found, id: " + newItem.id);
             materials.push({
               item: foundItemData,
               amount: newItem.amount,
@@ -436,7 +445,8 @@ export default function Home() {
           const qpCost = svtData.appendSkillMaterials[index].qp;
           if (qpCost > 0) {
             const foundQPData = itemData.find((item) => item.id === QP_ITEM_ID);
-            if (!foundQPData) throw new Error("QP item data not found");
+            if (!foundQPData)
+              throw new Error("QP item data not found, id: " + QP_ITEM_ID);
             materials.push({
               item: foundQPData,
               amount: qpCost,
@@ -461,7 +471,7 @@ export default function Home() {
       const svtData = allSvtData.find((svt) => svt.id === cardData.servantID);
       if (!svtData) return;
 
-      const svtMats: CombinedMaterials = { items: [], expCards: [] };
+      const svtMats: CombinedRequirements = { items: [], expCards: [] };
 
       let newMats: ItemRequirements | ExpRequirements;
       newMats = getExpMats(svtData, 5, cardData.level.from, cardData.level.to);

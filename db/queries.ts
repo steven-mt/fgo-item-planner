@@ -1,7 +1,8 @@
 import {
-  UpdateUserPlannerData,
   UserInsert,
   UserSelect,
+  UserUpdateOwnedMaterials,
+  UserUpdatePlannerData,
 } from "@/app/_types/drizzle";
 import { eq } from "drizzle-orm";
 import { db } from "./db";
@@ -26,11 +27,23 @@ export const getUser = async (id: string): Promise<UserSelect | null> => {
 };
 
 export const updateUserPlanner = async (
-  updateData: UpdateUserPlannerData,
+  updateData: UserUpdatePlannerData,
 ): Promise<string | null> => {
   const updatedIDs = await db
     .update(users)
     .set({ plannerState: updateData.newPlannerState })
+    .where(eq(users.id, updateData.targetUserID))
+    .returning({ updatedID: users.id });
+
+  return updatedIDs.length === 0 ? null : updatedIDs[0].updatedID;
+};
+
+export const updateUserOwnedMaterials = async (
+  updateData: UserUpdateOwnedMaterials,
+): Promise<string | null> => {
+  const updatedIDs = await db
+    .update(users)
+    .set({ ownedMaterials: updateData.newOwnedMaterials })
     .where(eq(users.id, updateData.targetUserID))
     .returning({ updatedID: users.id });
 

@@ -1,11 +1,16 @@
 import { users } from "@/db/schema";
 import { InferInsertModel, InferSelectModel } from "drizzle-orm";
-import { PlannerState } from "./planner";
+import { OwnedMaterials, PlannerState } from "./planner";
 
-export interface UpdateUserPlannerData {
+export type UserSelect = InferSelectModel<typeof users>;
+export type UserInsert = InferInsertModel<typeof users>;
+
+export interface UserUpdatePlannerData {
   targetUserID: string;
   newPlannerState: PlannerState;
 }
 
-export type UserSelect = InferSelectModel<typeof users>;
-export type UserInsert = InferInsertModel<typeof users>;
+export interface UserUpdateOwnedMaterials {
+  targetUserID: string;
+  newOwnedMaterials: OwnedMaterials;
+}

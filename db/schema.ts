@@ -1,4 +1,4 @@
-import { PlannerState } from "@/app/_types/planner";
+import { OwnedMaterials, PlannerState } from "@/app/_types/planner";
 import { jsonb, pgEnum, pgTable, text, uuid } from "drizzle-orm/pg-core";
 
 export const themeEnum = pgEnum("theme", ["light", "dark", "system"]);
@@ -9,4 +9,5 @@ export const users = pgTable("users", {
   email: text("email").notNull(),
   theme: themeEnum("theme").default("system").notNull(),
   plannerState: jsonb("planner_state").$type<PlannerState>(),
+  ownedMaterials: jsonb("owned_materials").$type<OwnedMaterials>(),
 });

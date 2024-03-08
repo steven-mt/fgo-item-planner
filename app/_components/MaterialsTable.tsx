@@ -8,8 +8,9 @@ import {
   TypographyProps,
 } from "@mui/material";
 import Image from "next/image";
-import { memo, useState } from "react";
+import React, { Dispatch, SetStateAction, memo, useState } from "react";
 import { Virtuoso } from "react-virtuoso";
+import { useOwnedMaterialsContext } from "../_context/useOwnedMaterialsContext";
 import { usePlannerStateContext } from "../_context/usePlannerStateContext";
 import { ParsedItem } from "../_types/material";
 import { CardMaterials, MaterialUse } from "../_types/planner";
@@ -72,8 +73,19 @@ const RowMainContent = memo(
     index: number;
     data: RowItem;
     currentOpenIndex: number;
-    setCurrentOpenIndex: React.Dispatch<React.SetStateAction<number>>;
+    setCurrentOpenIndex: Dispatch<SetStateAction<number>>;
   }) => {
+    const { ownedMaterials, setOwnedMaterials } = useOwnedMaterialsContext();
+
+    const foundOwnedMatIndex = ownedMaterials.findIndex(
+      (ownedMat) => ownedMat.id === data.id,
+    );
+
+    const ownedAmount: number | null =
+      foundOwnedMatIndex === -1
+        ? null
+        : ownedMaterials[foundOwnedMatIndex].amount;
+
     return (
       <>
         <Grid container alignItems="center">
@@ -99,11 +111,34 @@ const RowMainContent = memo(
           </Grid>
 
           <Grid item xs={2}>
-            {/* TODO: add owned materials */}
             <TextField
               size="small"
               inputProps={{ style: { padding: 8 } }}
               sx={{ minWidth: "2rem" }}
+              value={ownedAmount ?? ""}
+              onChange={(event) => {
+                const newValue = Number(event.target.value);
+
+                if (isNaN(Number(event.target.value))) return;
+
+                if (newValue === 0) {
+                  setOwnedMaterials((prevState) =>
+                    prevState.filter(
+                      (idAndAmount) => idAndAmount.id !== data.id,
+                    ),
+                  );
+                  return;
+                }
+
+                setOwnedMaterials((prevState) => {
+                  if (foundOwnedMatIndex === -1) {
+                    return [...prevState, { id: data.id, amount: newValue }];
+                  }
+
+                  prevState[foundOwnedMatIndex].amount = newValue;
+                  return structuredClone(prevState);
+                });
+              }}
             />
           </Grid>
 

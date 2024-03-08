@@ -15,6 +15,13 @@
       "when": 1708013021621,
       "tag": "0001_black_landau",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "5",
+      "when": 1709894613770,
+      "tag": "0002_supreme_eddie_brock",
+      "breakpoints": true
     }
   ]
 }

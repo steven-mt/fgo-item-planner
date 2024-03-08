@@ -1,7 +1,8 @@
 import {
-  UpdateUserPlannerData,
   UserInsert,
   UserSelect,
+  UserUpdateOwnedMaterials,
+  UserUpdatePlannerData,
 } from "../_types/drizzle";
 
 export const getUserFetch = async (
@@ -28,10 +29,22 @@ export const insertUserFetch = async (
   return response.json();
 };
 
-export const updateUserFetch = async (
-  updateData: UpdateUserPlannerData,
+export const updateUserPlannerFetch = async (
+  updateData: UserUpdatePlannerData,
 ): Promise<string | null> => {
   const response = await fetch("/api/updateUserPlanner", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(updateData),
+  });
+
+  return response.json();
+};
+
+export const updateUserMatsFetch = async (
+  updateData: UserUpdateOwnedMaterials,
+): Promise<string | null> => {
+  const response = await fetch("api/updateUserMats", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify(updateData),

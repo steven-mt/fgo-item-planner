@@ -96,7 +96,7 @@ export type ExpRequirements = {
   amount: number;
 }[];
 
-export interface CombinedMaterials {
+export interface CombinedRequirements {
   items: {
     item: ParsedItem;
     totalAmount: number;
@@ -107,5 +107,10 @@ export interface CombinedMaterials {
 
 export interface CardMaterials {
   cardID: number;
-  materials: CombinedMaterials;
+  materials: CombinedRequirements;
 }
+
+export type OwnedMaterials = {
+  id: number;
+  amount: number;
+}[];
