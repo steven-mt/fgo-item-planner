@@ -90,6 +90,10 @@ const MaterialsTableRow = memo(
         ? null
         : ownedMaterials[foundOwnedMatIndex].amount;
 
+    const [displayValue, setDisplayValue] = useState<string>(
+      ownedAmount === null ? "" : ownedAmount.toString(),
+    );
+
     return (
       <>
         <Grid container alignItems="center">
@@ -119,13 +123,22 @@ const MaterialsTableRow = memo(
               size="small"
               inputProps={{ style: { padding: 8 } }}
               sx={{ minWidth: "2rem" }}
-              value={ownedAmount ?? ""}
+              value={displayValue}
               onChange={(event) => {
-                const newValue = Number(event.target.value);
+                setDisplayValue(event.target.value);
+              }}
+              onBlur={(event) => {
+                const newValue = parseInt(event.target.value, 10);
 
-                if (isNaN(Number(event.target.value))) return;
+                if (isNaN(newValue)) {
+                  setDisplayValue("");
+                  return;
+                }
+
+                if (newValue === ownedAmount) return;
 
                 if (newValue === 0) {
+                  setDisplayValue("");
                   setOwnedMaterials((prevState) =>
                     prevState.filter(
                       (idAndAmount) => idAndAmount.id !== data.id,
@@ -134,6 +147,7 @@ const MaterialsTableRow = memo(
                   return;
                 }
 
+                setDisplayValue(newValue.toString());
                 setOwnedMaterials((prevState) => {
                   if (foundOwnedMatIndex === -1) {
                     return [...prevState, { id: data.id, amount: newValue }];
