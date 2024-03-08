@@ -20,7 +20,7 @@ interface RowSvtData {
   id: number;
   name: string;
   icon: string;
-  uses: { [use in MaterialUse]?: number };
+  uses: { [use in MaterialUse | "exp"]?: number };
 }
 
 interface RowItem {
@@ -63,7 +63,7 @@ const NumberTypography = ({
   );
 };
 
-const RowMainContent = memo(
+const MaterialsTableRow = memo(
   ({
     index,
     data,
@@ -76,6 +76,10 @@ const RowMainContent = memo(
     setCurrentOpenIndex: Dispatch<SetStateAction<number>>;
   }) => {
     const { ownedMaterials, setOwnedMaterials } = useOwnedMaterialsContext();
+
+    const isExp = data.servantData.every(
+      (rowSvtData) => typeof rowSvtData.uses.exp !== "undefined",
+    );
 
     const foundOwnedMatIndex = ownedMaterials.findIndex(
       (ownedMat) => ownedMat.id === data.id,
@@ -158,76 +162,131 @@ const RowMainContent = memo(
             },
           }}
         >
-          <Grid container>
-            <Grid item xs={4}>
-              <HeaderTypography>Servant</HeaderTypography>
-            </Grid>
+          {data.servantData.length === 0 && (
+            <Typography variant="body1">
+              No servants require this material.
+            </Typography>
+          )}
 
-            <Grid item xs={2} paddingRight={1}>
-              <HeaderTypography props={{ textAlign: "end" }}>
-                Ascension
-              </HeaderTypography>
-            </Grid>
-
-            <Grid item xs={2} paddingRight={1}>
-              <HeaderTypography props={{ textAlign: "end" }}>
-                Palingenesis
-              </HeaderTypography>
-            </Grid>
-
-            <Grid item xs={2} paddingRight={1}>
-              <HeaderTypography props={{ textAlign: "end" }}>
-                Skills
-              </HeaderTypography>
-            </Grid>
-
-            <Grid item xs={2} paddingRight={1}>
-              <HeaderTypography props={{ textAlign: "end" }}>
-                Append Skills
-              </HeaderTypography>
-            </Grid>
-          </Grid>
-
-          {data.servantData.map((rowSvtData) => {
-            return (
-              <Grid key={rowSvtData.id} container>
-                <Grid item xs={4} display="flex" gap={1} alignItems="center">
-                  <Image
-                    alt="Face icon"
-                    src={rowSvtData.icon}
-                    width={32}
-                    height={32}
-                  />
-
-                  <Typography variant="body1">{rowSvtData.name}</Typography>
+          {data.servantData.length > 0 && isExp && (
+            <>
+              <Grid container>
+                <Grid item xs={8}>
+                  <HeaderTypography>Servant</HeaderTypography>
                 </Grid>
 
-                <Grid item xs={2} paddingRight={1}>
-                  <NumberTypography>
-                    {rowSvtData.uses.ascension}
-                  </NumberTypography>
-                </Grid>
-
-                <Grid item xs={2} paddingRight={1}>
-                  <NumberTypography>{rowSvtData.uses.grail}</NumberTypography>
-                </Grid>
-
-                <Grid item xs={2} paddingRight={1}>
-                  <NumberTypography>{rowSvtData.uses.skill}</NumberTypography>
-                </Grid>
-
-                <Grid item xs={2} paddingRight={1}>
-                  <NumberTypography>{rowSvtData.uses.append}</NumberTypography>
+                <Grid item xs={4}>
+                  <HeaderTypography>Amount</HeaderTypography>
                 </Grid>
               </Grid>
-            );
-          })}
+
+              {data.servantData.map((rowSvtData) => (
+                <Grid key={rowSvtData.id} container>
+                  <Grid item xs={8} display="flex" gap={1} alignItems="center">
+                    <Image
+                      alt="Face icon"
+                      src={rowSvtData.icon}
+                      width={32}
+                      height={32}
+                    />
+
+                    <Typography variant="body1">{rowSvtData.name}</Typography>
+                  </Grid>
+
+                  <Grid item xs={4}>
+                    <NumberTypography>{rowSvtData.uses.exp}</NumberTypography>
+                  </Grid>
+                </Grid>
+              ))}
+            </>
+          )}
+
+          {data.servantData.length > 0 && !isExp && (
+            <>
+              <Grid container>
+                <Grid item xs={4}>
+                  <HeaderTypography>Servant</HeaderTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <HeaderTypography props={{ textAlign: "end" }}>
+                    Ascension
+                  </HeaderTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <HeaderTypography props={{ textAlign: "end" }}>
+                    Palingenesis
+                  </HeaderTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <HeaderTypography props={{ textAlign: "end" }}>
+                    Skills
+                  </HeaderTypography>
+                </Grid>
+
+                <Grid item xs={2} paddingRight={1}>
+                  <HeaderTypography props={{ textAlign: "end" }}>
+                    Append Skills
+                  </HeaderTypography>
+                </Grid>
+              </Grid>
+
+              {data.servantData.map((rowSvtData) => {
+                return (
+                  <Grid key={rowSvtData.id} container>
+                    <Grid
+                      item
+                      xs={4}
+                      display="flex"
+                      gap={1}
+                      alignItems="center"
+                    >
+                      <Image
+                        alt="Face icon"
+                        src={rowSvtData.icon}
+                        width={32}
+                        height={32}
+                      />
+
+                      <Typography variant="body1">{rowSvtData.name}</Typography>
+                    </Grid>
+
+                    <Grid item xs={2} paddingRight={1}>
+                      <NumberTypography>
+                        {rowSvtData.uses.ascension}
+                      </NumberTypography>
+                    </Grid>
+
+                    <Grid item xs={2} paddingRight={1}>
+                      <NumberTypography>
+                        {rowSvtData.uses.grail}
+                      </NumberTypography>
+                    </Grid>
+
+                    <Grid item xs={2} paddingRight={1}>
+                      <NumberTypography>
+                        {rowSvtData.uses.skill}
+                      </NumberTypography>
+                    </Grid>
+
+                    <Grid item xs={2} paddingRight={1}>
+                      <NumberTypography>
+                        {rowSvtData.uses.append}
+                      </NumberTypography>
+                    </Grid>
+                  </Grid>
+                );
+              })}
+            </>
+          )}
         </Collapse>
       </>
     );
   },
 );
-RowMainContent.displayName = "row";
+MaterialsTableRow.displayName = "MaterialsTableRow";
 
 export const MaterialsTable = ({
   allSvtData,
@@ -247,8 +306,7 @@ export const MaterialsTable = ({
       (item.type === "qp" ||
         item.type === "skillLvUp" ||
         item.type === "tdLvUp") &&
-      !(50 <= item.id && item.id <= 5003)
-      // exclude items for class score and code openers
+      !(50 <= item.id && item.id <= 5003) // exclude items for class score and code openers
     ) {
       rowItems.push(
         structuredClone({ ...item, servantData: [], totalAmount: 0 }),
@@ -314,6 +372,7 @@ export const MaterialsTable = ({
         continue;
       }
 
+      // Servant data for the row exists, so go through each use and update amount
       const rowSvtUses = foundRowSvtData.uses;
 
       let usesProperty: keyof typeof newUses;
@@ -333,30 +392,61 @@ export const MaterialsTable = ({
 
   for (const cardMats of plannerMats) {
     for (const cardItemAndAmount of cardMats.materials.expCards) {
+      const foundRow = rowItems.find(
+        (rowItem) => rowItem.id === cardItemAndAmount.card.id,
+      );
+
       let svtID: number | null = null;
       for (const cardData of plannerState) {
         if (cardData.cardID === cardMats.cardID) svtID = cardData.servantID;
       }
       const foundSvtData = allSvtData.find((svtData) => svtData.id === svtID);
+      if (!foundSvtData)
+        throw new Error("Servant data not found, id: " + svtID);
 
-      const newRowSvtData: RowSvtData[] = [];
-      if (!foundSvtData) throw new Error("Servant data not found");
-      newRowSvtData.push({
-        id: foundSvtData.id,
-        icon: foundSvtData.faces[1],
-        name: foundSvtData.name,
-        uses: {},
-      });
+      if (foundRow === undefined) {
+        const newRowSvtData: RowSvtData[] = [];
+        newRowSvtData.push({
+          id: foundSvtData.id,
+          icon: foundSvtData.faces[1],
+          name: foundSvtData.name,
+          uses: { exp: cardItemAndAmount.amount },
+        });
 
-      rowItems.push(
-        structuredClone({
-          id: cardItemAndAmount.card.id,
-          icon: cardItemAndAmount.card.icon,
-          name: cardItemAndAmount.card.name,
-          servantData: newRowSvtData,
-          totalAmount: cardItemAndAmount.amount,
-        }),
+        rowItems.push(
+          structuredClone({
+            id: cardItemAndAmount.card.id,
+            icon: cardItemAndAmount.card.icon,
+            name: cardItemAndAmount.card.name,
+            servantData: newRowSvtData,
+            totalAmount: cardItemAndAmount.amount,
+          }),
+        );
+
+        continue;
+      }
+
+      const foundRowSvtData = foundRow.servantData.find(
+        (rowSvtData) => rowSvtData.id === svtID,
       );
+
+      foundRow.totalAmount += cardItemAndAmount.amount;
+
+      /* There should be no need to check if servant data already exists for the
+         row, as exp reqs are only listed once for each input card, but we use
+         it for now as the current implementation allows multiple cards to have the
+         same servant. */
+      if (foundRowSvtData === undefined) {
+        foundRow.servantData.push(
+          structuredClone({
+            id: foundSvtData.id,
+            name: foundSvtData.name,
+            icon: foundSvtData.faces[1],
+            uses: { exp: cardItemAndAmount.amount },
+          }),
+        );
+        continue;
+      }
     }
   }
 
@@ -399,7 +489,7 @@ export const MaterialsTable = ({
         style={{ height: `calc(100% - ${HEADER_HEIGHT})` }}
         data={rowItems}
         itemContent={(index, data) => (
-          <RowMainContent
+          <MaterialsTableRow
             index={index}
             data={data}
             currentOpenIndex={currentOpenIndex}
