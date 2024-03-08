@@ -2,12 +2,13 @@ import { z } from "zod";
 
 export const itemTypeSchema = z.enum([
   "qp",
-  "mana",
-  "skillLvUp",
-  "tdLvUp",
-  "rarePri",
-  "costumeRelease",
-  "commandCardPrmUp",
+  "mana", // mana prism
+  "skillLvUp", // skill gems, general skill/ascension mats
+  "tdLvUp", // pieces and monuments, holy grail and tear
+  "eventItem", // includes ascension items for welfares
+  "rarePri", // rare prism
+  "costumeRelease", // only includes a few wardrobe keys
+  "commandCardPrmUp", // beast's footprint
   "svtCoin",
 ]);
 
