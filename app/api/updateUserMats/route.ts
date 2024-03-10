@@ -6,5 +6,5 @@ export const POST = async (request: Request) => {
 
   const updatedID = await updateUserOwnedMaterials(data);
 
-  return updatedID;
+  return Response.json(updatedID);
 };
